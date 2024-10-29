@@ -7,5 +7,4 @@ type Configs struct {
 // Server 服务器配置
 type Server struct {
 	Address string `mapstructure:"address"`
-	Port    int    `mapstructure:"port"`
 }

@@ -3,24 +3,58 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/mitchellh/mapstructure"
+	"github.com/spf13/viper"
 	"net/http"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mitchellh/mapstructure"
-	"github.com/spf13/viper"
-
 	"go-web-template/global"
 )
 
-// confPath 配置文件路径
-var confPath string
-
 func main() {
+
 	initCommandLineFlag()
 
-	// 加载配置文件
-	viper.SetConfigFile(confPath)
+	initConfig(global.ConfFile)
+
+	//初始化日志
+
+	//todo user gin.ReleaseMode
+	gin.SetMode(gin.DebugMode)
+	r := gin.New()
+	r.GET("/ping", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "pong",
+		})
+	})
+
+	address := ":8080"
+	if global.Configs != nil && global.Configs.Server.Address != "" {
+		address = global.Configs.Server.Address
+	}
+	err := r.Run(address)
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
+
+	fmt.Println("server address", address)
+}
+
+// initCommandLineFlag 初始化命令行参数
+func initCommandLineFlag() {
+	flag.StringVar(&global.ConfFile, "conf", "./configs/config_dev.toml", "config path, eg: -conf config.yaml")
+	flag.Parse()
+
+	absConfPath, _ := filepath.Abs(global.ConfFile)
+	fmt.Println("confPath: ", global.ConfFile)
+	fmt.Println("confPath abs: ", absConfPath)
+}
+
+// initConfig 初始化配置
+func initConfig(configFile string) {
+	viper.SetConfigFile(configFile)
 
 	err := viper.ReadInConfig()
 	if err != nil {
@@ -40,41 +74,6 @@ func main() {
 		fmt.Println(err)
 		panic(err)
 	}
-	fmt.Printf("config info, config path:%#v, config:%#v\n", confPath, global.Configs)
 
-	//todo user gin.ReleaseMode
-	gin.SetMode(gin.DebugMode)
-	r := gin.New()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
-
-	defaultAddress := "0.0.0.0"
-	defaultPort := 8888
-	if global.Configs != nil && global.Configs.Server.Address != "" {
-		defaultAddress = global.Configs.Server.Address
-	}
-	if global.Configs != nil && global.Configs.Server.Port != 0 {
-		defaultPort = global.Configs.Server.Port
-	}
-	addr := defaultAddress + ":" + fmt.Sprintf("%d", defaultPort)
-	fmt.Println(addr)
-
-	err = r.Run(addr)
-	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
-}
-
-// initCommandLineFlag 初始化命令行参数
-func initCommandLineFlag() {
-	flag.StringVar(&confPath, "conf", "./configs/config_dev.toml", "config path, eg: -conf config.yaml")
-	flag.Parse()
-
-	abs, _ := filepath.Abs(confPath)
-	fmt.Println("confPath: ", confPath)
-	fmt.Println("confPath abs: ", abs)
+	fmt.Printf("config info, config path:%#v, config:%#v\n", configFile, global.Configs)
 }
