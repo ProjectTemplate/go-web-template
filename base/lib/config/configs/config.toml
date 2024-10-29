@@ -1,6 +1,0 @@
-[server]
-    address = "127.0.0.1:8080"
-
-[log]
-    console = true
-    level = "DEBUG"

@@ -1,15 +1,24 @@
 package logger
 
 import (
+	"go-web-template/base/lib/config"
 	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestName(t *testing.T) {
-	logger := New()
+func initLogger() {
+	configs := config.Configs{}
+	config.Init("./data/config.toml", &configs)
 
+	Init(configs.LoggerConfig)
+}
+
+func TestName(t *testing.T) {
+	initLogger()
+
+	logger := New()
 	logger.Info("Info")
 	logger.Error("Error")
 	defer logger.Sync()
@@ -17,6 +26,8 @@ func TestName(t *testing.T) {
 }
 
 func TestMultiSingle(t *testing.T) {
+	initLogger()
+
 	logger := New()
 	times := 1024
 	for i := 0; i < times; i++ {
@@ -25,6 +36,8 @@ func TestMultiSingle(t *testing.T) {
 }
 
 func TestMultiOpen(t *testing.T) {
+	initLogger()
+	
 	waitGroup := sync.WaitGroup{}
 	waitGroup.Add(2)
 	go func() {

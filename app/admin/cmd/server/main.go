@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"go-web-template/base/common/utils"
 	"go-web-template/base/lib/config"
 	"go-web-template/base/lib/logger"
 	"net/http"
@@ -12,11 +13,14 @@ import (
 	"go-web-template/app/admin/internal/global"
 )
 
+// confFile 配置文件路径
+var confFile string
+
 func main() {
 
 	initCommandLineFlag()
 
-	config.Init(global.ConfFile, global.Configs)
+	config.Init(confFile, global.Configs)
 
 	logger.Init()
 
@@ -48,10 +52,12 @@ func main() {
 
 // initCommandLineFlag 初始化命令行参数
 func initCommandLineFlag() {
-	flag.StringVar(&global.ConfFile, "conf", "../../configs/config.toml", "config path, eg: -conf config.yaml")
+	flag.StringVar(&confFile, "conf", "../../configs/config_dev.toml", "config path, eg: -conf config.yaml")
 	flag.Parse()
 
-	absConfPath, _ := filepath.Abs(global.ConfFile)
-	fmt.Println("confPath: ", global.ConfFile)
+	absConfPath, err := filepath.Abs(confFile)
+	utils.PanicAndPrintIfNotNil(err)
+
+	fmt.Println("confPath: ", confFile)
 	fmt.Println("confPath abs: ", absConfPath)
 }

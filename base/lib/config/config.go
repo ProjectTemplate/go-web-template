@@ -19,8 +19,21 @@ type Server struct {
 
 // LoggerConfig 日志配置
 type LoggerConfig struct {
-	Level   string `mapstructure:"level"`
-	Console bool   `mapstructure:"console"`
+	// Level 日志级别 zapcore.Level
+	Level string `mapstructure:"level"`
+	// Console 是否输出到控制台
+	Console bool `mapstructure:"console"`
+	// Path 日志文件路径
+	Path string `mapstructure:"path"`
+	// FileName 日志文件名
+	FileName string `mapstructure:"file_name"`
+
+	// MaxSize 日志文件最大大小，单位MB
+	MaxSize int `mapstructure:"max_size"`
+	// MaxAge 日志文件最大个数
+	MaxBackups int `mapstructure:"max_backups"`
+	// MaxAge 日志文件最大保存天数
+	MaxAge int `mapstructure:"max_age"`
 }
 
 // Init 初始化配置
