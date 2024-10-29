@@ -1,11 +1,13 @@
 package global
 
 import (
-	"go-web-template/app/admin/conf"
+	"go-web-template/base/lib/config"
 )
 
-// ConfFile 配置文件路径
-var ConfFile string
+var (
+	// ConfFile 配置文件路径
+	ConfFile string
 
-// Configs 全局配置
-var Configs = &conf.Configs{}
+	// Configs 全局配置
+	Configs = &config.Configs{}
+)

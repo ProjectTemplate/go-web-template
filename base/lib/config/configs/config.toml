@@ -2,5 +2,5 @@
     address = "127.0.0.1:8080"
 
 [log]
-    console = false
+    console = true
     level = "DEBUG"
