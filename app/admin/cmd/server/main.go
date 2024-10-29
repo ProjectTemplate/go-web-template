@@ -42,10 +42,7 @@ func main() {
 		address = global.Configs.Server.Address
 	}
 	err := r.Run(address)
-	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
+	utils.PanicAndPrintIfNotNil(err)
 
 	fmt.Println("server address", address)
 }
