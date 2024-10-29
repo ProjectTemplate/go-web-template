@@ -1,6 +1,8 @@
 package global
 
-import "go-web-template/conf"
+import (
+	"go-web-template/app/admin/conf"
+)
 
 // ConfFile 配置文件路径
 var ConfFile string

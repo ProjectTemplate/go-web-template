@@ -1,8 +1,8 @@
 
-.PHONY: build
-build:
-	go build .
+.PHONY: build-admin
+build-admin:
+	cd ./app/admin/cmd/server &&  go build .
 
-.PHONY: run
-run:
-	go run main.go
+.PHONY: run-admin
+run-admin:
+	cd ./app/admin/cmd/server && go run main.go

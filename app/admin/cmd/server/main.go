@@ -3,13 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/mitchellh/mapstructure"
-	"github.com/spf13/viper"
 	"net/http"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
-	"go-web-template/global"
+	"github.com/mitchellh/mapstructure"
+	"github.com/spf13/viper"
+
+	"go-web-template/app/admin/internal/global"
 )
 
 func main() {
@@ -44,7 +45,7 @@ func main() {
 
 // initCommandLineFlag 初始化命令行参数
 func initCommandLineFlag() {
-	flag.StringVar(&global.ConfFile, "conf", "./configs/config_dev.toml", "config path, eg: -conf config.yaml")
+	flag.StringVar(&global.ConfFile, "conf", "../..//configs/config_dev.toml", "config path, eg: -conf config.yaml")
 	flag.Parse()
 
 	absConfPath, _ := filepath.Abs(global.ConfFile)

@@ -1,8 +1,4 @@
-package conf
-
-type Configs struct {
-	Server Server `mapstructure:"server"`
-}
+package config
 
 // Server 服务器配置
 type Server struct {
