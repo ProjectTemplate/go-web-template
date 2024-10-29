@@ -37,7 +37,7 @@ func TestMultiSingle(t *testing.T) {
 
 func TestMultiOpen(t *testing.T) {
 	initLogger()
-	
+
 	waitGroup := sync.WaitGroup{}
 	waitGroup.Add(2)
 	go func() {

@@ -22,7 +22,7 @@ func main() {
 
 	config.Init(confFile, global.Configs)
 
-	logger.Init()
+	logger.Init(global.Configs.LoggerConfig)
 
 	logger.New().Warnf("Warn")
 	logger.New().Infof("Info")

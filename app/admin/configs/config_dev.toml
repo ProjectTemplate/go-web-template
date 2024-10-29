@@ -2,5 +2,10 @@
     address = "127.0.0.1:8080"
 
 [log]
-    console = false
+    console = true
     level = "DEBUG"
+    path = "./"
+    file_name = "server.log"
+    max_size = 100
+    max_backups = 30
+    max_age = 15
