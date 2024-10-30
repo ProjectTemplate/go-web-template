@@ -7,22 +7,22 @@ import (
 	"testing"
 )
 
-func initLogger() {
+func initLogger(name string) {
 	configs := config.Configs{}
 	config.Init("./data/config.toml", &configs)
 
-	Init(configs.LoggerConfig)
+	Init("", configs.LoggerConfig)
 }
 
 func TestName(t *testing.T) {
-	initLogger()
+	initLogger("TestName")
 
 	SInfoF(context.Background(), "Info")
 	SErrorF(context.Background(), "Error")
 }
 
 func TestMultiSingle(t *testing.T) {
-	initLogger()
+	initLogger("TestMultiSingle")
 
 	times := 1024
 	for i := 0; i < times; i++ {
@@ -31,7 +31,7 @@ func TestMultiSingle(t *testing.T) {
 }
 
 func TestMultiOpen(t *testing.T) {
-	initLogger()
+	initLogger("TestMultiOpen")
 
 	waitGroup := sync.WaitGroup{}
 	waitGroup.Add(2)

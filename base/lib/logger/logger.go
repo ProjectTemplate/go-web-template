@@ -19,7 +19,7 @@ var (
 	logger        *zap.Logger
 	loggerSugared *zap.SugaredLogger
 
-	loggerProxy     *Proxy
+	loggerProxy     *Writer
 	loggerProxyOnce sync.Once
 )
 
@@ -39,7 +39,7 @@ const (
 )
 
 // Init 初始化日志
-func Init(loggerConfig config.LoggerConfig) {
+func Init(projectName string, loggerConfig config.LoggerConfig) {
 	filePath := defaultPath
 	fileName := defaultFileName
 	level := defaultLevel
@@ -98,14 +98,19 @@ func Init(loggerConfig config.LoggerConfig) {
 	consoleEncoder := zapcore.NewConsoleEncoder(NewEncoderConfig())
 
 	var cores = make([]zapcore.Core, 0, 2)
-	cores = append(cores, zapcore.NewCore(logFileEncoder, output, levelEnable))
+	newCore := zapcore.NewCore(logFileEncoder, output, levelEnable)
+	newCore = newCore.With([]zap.Field{zap.String("projectName", projectName)})
+	cores = append(cores, newCore)
 	if loggerConfig.Console {
-		cores = append(cores, zapcore.NewCore(consoleEncoder, console, levelEnable))
+		consoleCore := zapcore.NewCore(consoleEncoder, console, levelEnable)
+		consoleCore = consoleCore.With([]zap.Field{zap.String("projectName", projectName)})
+		cores = append(cores, consoleCore)
 	}
 
 	core := zapcore.NewTee(cores...)
 
 	l := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.WarnLevel))
+
 	logger = l
 	loggerSugared = l.Sugar()
 }

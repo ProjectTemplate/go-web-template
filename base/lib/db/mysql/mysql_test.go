@@ -12,7 +12,7 @@ import (
 func TestGorm(t *testing.T) {
 	configStruct := &config.Configs{}
 	config.Init("./data/config.toml", configStruct)
-	logger.Init(configStruct.LoggerConfig)
+	logger.Init("TestGorm", configStruct.LoggerConfig)
 
 	dbMap, err := Init(context.Background(), configStruct.DB)
 
@@ -30,7 +30,7 @@ func TestGorm(t *testing.T) {
 func TestGormError(t *testing.T) {
 	configStruct := &config.Configs{}
 	config.Init("./data/config.toml", configStruct)
-	logger.Init(configStruct.LoggerConfig)
+	logger.Init("TestGormError", configStruct.LoggerConfig)
 
 	dbMap, err := Init(context.Background(), configStruct.DB)
 

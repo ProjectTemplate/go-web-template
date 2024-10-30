@@ -5,20 +5,20 @@ import (
 	"io"
 )
 
-var _ io.Writer = (*Proxy)(nil)
+var _ io.Writer = (*Writer)(nil)
 
-// Proxy 日志代理
-type Proxy struct {
+// Writer 日志代理
+type Writer struct {
 }
 
-func GetLoggerProxy() *Proxy {
+func GetWriter() io.Writer {
 	loggerProxyOnce.Do(func() {
-		loggerProxy = &Proxy{}
+		loggerProxy = &Writer{}
 	})
 	return loggerProxy
 }
 
-func (p *Proxy) Write(data []byte) (n int, err error) {
+func (p *Writer) Write(data []byte) (n int, err error) {
 	Info(context.Background(), string(data))
 	return len(data), nil
 }

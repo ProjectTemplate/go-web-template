@@ -28,7 +28,7 @@ func main() {
 
 	config.Init(confFile, global.Configs)
 
-	logger.Init(global.Configs.LoggerConfig)
+	logger.Init("go-web", global.Configs.LoggerConfig)
 
 	logger.Info(background, "start server.", zap.String("confFile", confFile), zap.Any("configs", global.Configs))
 
@@ -40,6 +40,7 @@ func main() {
 
 	r := gin.New()
 	// 中间件处理
+
 	r.Use(middleware.PanicRecover())
 
 	r.GET("/ping", func(c *gin.Context) {
