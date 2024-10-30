@@ -13,7 +13,10 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-var logger *zap.SugaredLogger
+var (
+	logger        *zap.Logger
+	loggerSugared *zap.SugaredLogger
+)
 
 const (
 	// defaultPath 日志路径
@@ -85,16 +88,20 @@ func Init(loggerConfig config.LoggerConfig) {
 	})
 
 	console := zapcore.Lock(os.Stdout)
-	prodEncoder := zapcore.NewJSONEncoder(NewEncoderConfig())
-	devEncoder := zapcore.NewConsoleEncoder(NewEncoderConfig())
+	logFileEncoder := zapcore.NewJSONEncoder(NewEncoderConfig())
+	consoleEncoder := zapcore.NewConsoleEncoder(NewEncoderConfig())
 
-	core := zapcore.NewTee(
-		zapcore.NewCore(devEncoder, console, levelEnable),
-		zapcore.NewCore(prodEncoder, output, levelEnable),
-	)
+	var cores = make([]zapcore.Core, 0, 2)
+	cores = append(cores, zapcore.NewCore(logFileEncoder, output, levelEnable))
+	if loggerConfig.Console {
+		zapcore.NewCore(consoleEncoder, console, levelEnable)
+	}
+
+	core := zapcore.NewTee(cores...)
 
 	l := zap.New(core, zap.AddCaller())
-	logger = l.Sugar()
+	logger = l
+	loggerSugared = l.Sugar()
 }
 
 func NewEncoderConfig() zapcore.EncoderConfig {
@@ -107,16 +114,29 @@ func NewEncoderConfig() zapcore.EncoderConfig {
 		StacktraceKey:  "stack",
 		LineEnding:     zapcore.DefaultLineEnding,
 		EncodeLevel:    zapcore.CapitalLevelEncoder,
-		EncodeTime:     TimeEncoder,
+		EncodeTime:     timeEncoder,
 		EncodeDuration: zapcore.StringDurationEncoder,
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
 }
 
-func New() *zap.SugaredLogger {
+func Logger() *zap.Logger {
+	checkNil()
 	return logger
 }
 
-func TimeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+func Sugared() *zap.SugaredLogger {
+	checkNil()
+	return loggerSugared
+}
+
+func timeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 	enc.AppendString(t.Format("2006-01-02 15:04:05.000"))
+}
+
+func checkNil() {
+	if logger == nil {
+		fmt.Println("loggerSugared is nil, please init logger first")
+		panic("loggerSugared is nil, please init logger first")
+	}
 }

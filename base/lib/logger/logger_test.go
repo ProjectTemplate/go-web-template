@@ -18,7 +18,7 @@ func initLogger() {
 func TestName(t *testing.T) {
 	initLogger()
 
-	logger := New()
+	logger := Sugared()
 	logger.Info("Info")
 	logger.Error("Error")
 	defer logger.Sync()
@@ -28,7 +28,7 @@ func TestName(t *testing.T) {
 func TestMultiSingle(t *testing.T) {
 	initLogger()
 
-	logger := New()
+	logger := Sugared()
 	times := 1024
 	for i := 0; i < times; i++ {
 		logger.Infow("测试打印日志", "name", "name")
@@ -41,8 +41,8 @@ func TestMultiOpen(t *testing.T) {
 	waitGroup := sync.WaitGroup{}
 	waitGroup.Add(2)
 	go func() {
-		logger := New()
-		times := 1024
+		logger := Sugared()
+		times := 102400
 		for i := 0; i < times; i++ {
 			logger.Infow("1111111111", "name", "name")
 		}
@@ -50,8 +50,8 @@ func TestMultiOpen(t *testing.T) {
 	}()
 
 	go func() {
-		logger := New()
-		times := 1024
+		logger := Sugared()
+		times := 102400
 		for i := 0; i < times; i++ {
 			logger.Infow("2222222222", "name", "name")
 		}
