@@ -1,0 +1,91 @@
+package mysql
+
+import (
+	"errors"
+	"log"
+	"os"
+	"time"
+
+	"go.uber.org/zap"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/plugin/dbresolver"
+
+	gormLogger "gorm.io/gorm/logger"
+
+	"go-web-template/base/common/utils"
+	"go-web-template/base/lib/config"
+	"go-web-template/base/lib/logger"
+)
+
+func Init(dbConfigs map[string]config.DB) (map[string]gorm.DB, error) {
+	logger.Logger().Info("init mysql, config info: ", zap.Any("config", dbConfigs))
+
+	result := make(map[string]gorm.DB, len(dbConfigs))
+
+	for dnName, dbConfig := range dbConfigs {
+		logger.Logger().Info("init mysql, config info: ", zap.String("dnName", dnName), zap.Any("config", dbConfig))
+		if len(dbConfig.DSN) < 1 {
+			return result, errors.New("mysql config error, dsn is empty. db name: " + dnName)
+		}
+
+		dbLoggerLevel := gormLogger.Silent
+		if dbConfig.IsLogger {
+			dbLoggerLevel = gormLogger.Info
+		}
+
+		//主库，第一个配置为主库
+		db, err := gorm.Open(mysql.Open(dbConfig.DSN[0]), &gorm.Config{
+			Logger: gormLogger.New(
+				log.New(os.Stdout, "\r\n", log.LstdFlags),
+				gormLogger.Config{
+					SlowThreshold:             time.Second,
+					Colorful:                  false,
+					IgnoreRecordNotFoundError: true,
+					ParameterizedQueries:      true,
+					LogLevel:                  dbLoggerLevel,
+				}),
+		})
+
+		utils.PanicAndPrintIfNotNil(err)
+
+		//从库，除了第一个库，其余的库为从库
+		var replicas = make([]gorm.Dialector, 0, len(dbConfig.DSN)-1)
+		if len(dbConfig.DSN) > 1 {
+			for i := range dbConfig.DSN[1:] {
+				replicas = append(replicas, mysql.Open(dbConfig.DSN[i+1]))
+			}
+		}
+
+		plugin := dbresolver.Register(dbresolver.Config{
+			Replicas:          replicas,
+			Policy:            dbresolver.RandomPolicy{},
+			TraceResolverMode: true,
+		})
+
+		if dbConfig.MaxOpenConnections > 0 {
+			plugin.SetMaxOpenConns(dbConfig.MaxOpenConnections)
+		}
+
+		if dbConfig.MaxIdleConnections > 0 {
+			plugin.SetMaxIdleConns(dbConfig.MaxIdleConnections)
+		}
+
+		if dbConfig.MaxLifeTime > 0 {
+			plugin.SetConnMaxLifetime(dbConfig.MaxLifeTime)
+		}
+
+		if dbConfig.MaxIdleTime > 0 {
+			plugin.SetConnMaxIdleTime(dbConfig.MaxIdleTime)
+		}
+
+		err = db.Use(plugin)
+		if err != nil {
+			return result, err
+		}
+
+		result[dnName] = *db
+	}
+
+	return result, nil
+}

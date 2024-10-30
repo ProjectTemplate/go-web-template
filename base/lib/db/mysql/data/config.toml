@@ -1,7 +1,3 @@
-[server]
-    address = "127.0.0.1:8080"
-    debug = true
-
 [log]
     console = true
     level = "DEBUG"
@@ -14,6 +10,7 @@
 [db]
     [db.test]
         dsn = [
+            "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8&loc=Local&parseTime=True",
             "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8&loc=Local&parseTime=True"
         ]
         max_open_connections = 50

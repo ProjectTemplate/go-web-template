@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
+	"time"
 )
 
 // Configs 配置信息
 type Configs struct {
-	Server       Server       `mapstructure:"server"`
-	LoggerConfig LoggerConfig `mapstructure:"log"`
+	Server       Server        `mapstructure:"server"`
+	LoggerConfig LoggerConfig  `mapstructure:"log"`
+	DB           map[string]DB `mapstructure:"db"`
 }
 
 // Server 服务器配置
@@ -35,6 +37,15 @@ type LoggerConfig struct {
 	MaxBackups int `mapstructure:"max_backups"`
 	// MaxAge 日志文件最大保存天数
 	MaxAge int `mapstructure:"max_age"`
+}
+
+type DB struct {
+	DSN                []string      `mapstructure:"dsn"`
+	MaxOpenConnections int           `mapstructure:"max_open_connections"`
+	MaxIdleConnections int           `mapstructure:"max_idle_connections"`
+	MaxLifeTime        time.Duration `mapstructure:"max_life_time"`
+	MaxIdleTime        time.Duration `mapstructure:"max_idle_time"`
+	IsLogger           bool          `mapstructure:"is_logger"`
 }
 
 // Init 初始化配置
