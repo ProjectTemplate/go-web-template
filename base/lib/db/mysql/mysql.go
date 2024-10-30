@@ -3,7 +3,6 @@ package mysql
 import (
 	"errors"
 	"log"
-	"os"
 	"time"
 
 	"go.uber.org/zap"
@@ -13,7 +12,6 @@ import (
 
 	gormLogger "gorm.io/gorm/logger"
 
-	"go-web-template/base/common/utils"
 	"go-web-template/base/lib/config"
 	"go-web-template/base/lib/logger"
 )
@@ -24,7 +22,7 @@ func Init(dbConfigs map[string]config.DB) (map[string]gorm.DB, error) {
 	result := make(map[string]gorm.DB, len(dbConfigs))
 
 	for dnName, dbConfig := range dbConfigs {
-		logger.Logger().Info("init mysql, config info: ", zap.String("dnName", dnName), zap.Any("config", dbConfig))
+		logger.Logger().Info("init single mysql connection, config info: ", zap.String("dnName", dnName), zap.Any("config", dbConfig))
 		if len(dbConfig.DSN) < 1 {
 			return result, errors.New("mysql config error, dsn is empty. db name: " + dnName)
 		}
@@ -37,7 +35,7 @@ func Init(dbConfigs map[string]config.DB) (map[string]gorm.DB, error) {
 		//主库，第一个配置为主库
 		db, err := gorm.Open(mysql.Open(dbConfig.DSN[0]), &gorm.Config{
 			Logger: gormLogger.New(
-				log.New(os.Stdout, "\r\n", log.LstdFlags),
+				log.New(logger.GetLoggerProxy(), "", log.LstdFlags),
 				gormLogger.Config{
 					SlowThreshold:             time.Second,
 					Colorful:                  false,
@@ -47,7 +45,10 @@ func Init(dbConfigs map[string]config.DB) (map[string]gorm.DB, error) {
 				}),
 		})
 
-		utils.PanicAndPrintIfNotNil(err)
+		if err != nil {
+			logger.Logger().Error("init single mysql connection, error", zap.String("dnName", dnName), zap.Error(err))
+			return result, err
+		}
 
 		//从库，除了第一个库，其余的库为从库
 		var replicas = make([]gorm.Dialector, 0, len(dbConfig.DSN)-1)
@@ -81,10 +82,13 @@ func Init(dbConfigs map[string]config.DB) (map[string]gorm.DB, error) {
 
 		err = db.Use(plugin)
 		if err != nil {
+			logger.Logger().Error("init single mysql connection, error", zap.String("dnName", dnName), zap.Error(err))
 			return result, err
 		}
 
 		result[dnName] = *db
+
+		logger.Logger().Info("init single mysql connection success", zap.String("dnName", dnName))
 	}
 
 	return result, nil

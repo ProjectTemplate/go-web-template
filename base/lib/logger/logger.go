@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"sync"
 	"time"
 
 	"go.uber.org/zap"
@@ -16,11 +17,14 @@ import (
 var (
 	logger        *zap.Logger
 	loggerSugared *zap.SugaredLogger
+
+	loggerProxy     *Proxy
+	loggerProxyOnce sync.Once
 )
 
 const (
 	// defaultPath 日志路径
-	defaultPath = "/var/log/go-web"
+	defaultPath = "./"
 	// defaultFileName 日志文件名
 	defaultFileName = "server.log"
 	// defaultLevel 日志级别
