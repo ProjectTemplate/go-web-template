@@ -3,14 +3,16 @@ package main
 import (
 	"flag"
 	"fmt"
-	"go-web-template/base/common/utils"
-	"go-web-template/base/lib/config"
-	"go-web-template/base/lib/logger"
 	"net/http"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+
 	"go-web-template/app/admin/internal/global"
+	"go-web-template/base/common/utils"
+	"go-web-template/base/lib/config"
+	"go-web-template/base/lib/logger"
 )
 
 // confFile 配置文件路径
@@ -24,17 +26,13 @@ func main() {
 
 	logger.Init(global.Configs.LoggerConfig)
 
-	logger.New().Warnf("Warn")
-	logger.New().Infof("Info")
-	logger.New().Errorf("Error")
+	logger.Logger().Info("start server.", zap.String("confFile", confFile), zap.Any("configs", global.Configs))
 
-	//todo user gin.ReleaseMode
 	gin.SetMode(gin.DebugMode)
 	r := gin.New()
 	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
+		logger.Logger().Info("ping")
+		c.JSON(http.StatusOK, gin.H{"message": "pong"})
 	})
 
 	address := ":8080"
@@ -42,9 +40,11 @@ func main() {
 		address = global.Configs.Server.Address
 	}
 	err := r.Run(address)
+	if err != nil {
+		logger.Logger().Error("server run error", zap.Error(err))
+	}
 	utils.PanicAndPrintIfNotNil(err)
-
-	fmt.Println("server address", address)
+	logger.Logger().Info("server run success", zap.String("address", address))
 }
 
 // initCommandLineFlag 初始化命令行参数

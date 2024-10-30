@@ -78,14 +78,15 @@ func Init(loggerConfig config.LoggerConfig) {
 		return lvl >= level
 	})
 
-	output := zapcore.AddSync(&lumberjack.Logger{
+	lumberjackLogger := &lumberjack.Logger{
 		Filename:   logFile,
 		MaxSize:    maxSize,
 		MaxBackups: maxBackups,
 		MaxAge:     maxAge,
 		LocalTime:  true,
 		Compress:   false,
-	})
+	}
+	output := zapcore.AddSync(lumberjackLogger)
 
 	console := zapcore.Lock(os.Stdout)
 	logFileEncoder := zapcore.NewJSONEncoder(NewEncoderConfig())
@@ -94,12 +95,12 @@ func Init(loggerConfig config.LoggerConfig) {
 	var cores = make([]zapcore.Core, 0, 2)
 	cores = append(cores, zapcore.NewCore(logFileEncoder, output, levelEnable))
 	if loggerConfig.Console {
-		zapcore.NewCore(consoleEncoder, console, levelEnable)
+		cores = append(cores, zapcore.NewCore(consoleEncoder, console, levelEnable))
 	}
 
 	core := zapcore.NewTee(cores...)
 
-	l := zap.New(core, zap.AddCaller())
+	l := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
 	logger = l
 	loggerSugared = l.Sugar()
 }
