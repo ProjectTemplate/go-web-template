@@ -33,4 +33,5 @@ func TestParseConfig(t *testing.T) {
 	assert.Equal(t, time.Hour, conf.DB["test"].MaxLifeTime)
 	assert.Equal(t, time.Minute*10, conf.DB["test"].MaxIdleTime)
 	assert.Equal(t, true, conf.DB["test"].IsLogger)
+	assert.Equal(t, time.Second, conf.DB["test"].SlowThreshold)
 }

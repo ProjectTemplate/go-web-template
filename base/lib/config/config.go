@@ -46,6 +46,7 @@ type DB struct {
 	MaxLifeTime        time.Duration `mapstructure:"max_life_time"`
 	MaxIdleTime        time.Duration `mapstructure:"max_idle_time"`
 	IsLogger           bool          `mapstructure:"is_logger"`
+	SlowThreshold      time.Duration `mapstructure:"slow_threshold"`
 }
 
 // Init 初始化配置

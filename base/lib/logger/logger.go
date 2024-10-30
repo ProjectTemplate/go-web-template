@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"context"
 	"fmt"
 	"go-web-template/base/lib/config"
 	"os"
@@ -104,7 +105,7 @@ func Init(loggerConfig config.LoggerConfig) {
 
 	core := zapcore.NewTee(cores...)
 
-	l := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
+	l := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.WarnLevel))
 	logger = l
 	loggerSugared = l.Sugar()
 }
@@ -125,16 +126,6 @@ func NewEncoderConfig() zapcore.EncoderConfig {
 	}
 }
 
-func Logger() *zap.Logger {
-	checkNil()
-	return logger
-}
-
-func Sugared() *zap.SugaredLogger {
-	checkNil()
-	return loggerSugared
-}
-
 func timeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 	enc.AppendString(t.Format("2006-01-02 15:04:05.000"))
 }
@@ -144,4 +135,44 @@ func checkNil() {
 		fmt.Println("loggerSugared is nil, please init logger first")
 		panic("loggerSugared is nil, please init logger first")
 	}
+}
+
+func Debug(ctx context.Context, msg string, fields ...zap.Field) {
+	checkNil()
+	logger.Debug(msg, fields...)
+}
+
+func Info(ctx context.Context, msg string, fields ...zap.Field) {
+	checkNil()
+	logger.Info(msg, fields...)
+}
+
+func Warn(ctx context.Context, msg string, fields ...zap.Field) {
+	checkNil()
+	logger.Warn(msg, fields...)
+}
+
+func Error(ctx context.Context, msg string, fields ...zap.Field) {
+	checkNil()
+	logger.Error(msg, fields...)
+}
+
+func SDebugF(ctx context.Context, msg string, args ...interface{}) {
+	checkNil()
+	loggerSugared.Debugf(msg, args...)
+}
+
+func SInfoF(ctx context.Context, msg string, args ...interface{}) {
+	checkNil()
+	loggerSugared.Infof(msg, args...)
+}
+
+func SWarnF(ctx context.Context, msg string, args ...interface{}) {
+	checkNil()
+	loggerSugared.Warnf(msg, args...)
+}
+
+func SErrorF(ctx context.Context, msg string, args ...interface{}) {
+	checkNil()
+	loggerSugared.Errorf(msg, args...)
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"go-web-template/base/lib/middleware"
@@ -21,13 +22,15 @@ var confFile string
 
 func main() {
 
+	background := context.Background()
+
 	initCommandLineFlag()
 
 	config.Init(confFile, global.Configs)
 
 	logger.Init(global.Configs.LoggerConfig)
 
-	logger.Logger().Info("start server.", zap.String("confFile", confFile), zap.Any("configs", global.Configs))
+	logger.Info(background, "start server.", zap.String("confFile", confFile), zap.Any("configs", global.Configs))
 
 	ginMode := gin.ReleaseMode
 	if global.Configs.Server.Debug {
@@ -40,7 +43,7 @@ func main() {
 	r.Use(middleware.PanicRecover())
 
 	r.GET("/ping", func(c *gin.Context) {
-		logger.Logger().Info("ping")
+		logger.Info(c.Request.Context(), "ping")
 		c.JSON(http.StatusOK, gin.H{"message": "pong"})
 	})
 
@@ -55,11 +58,11 @@ func main() {
 
 	err := r.Run(address)
 	if err != nil {
-		logger.Logger().Error("server run error", zap.Error(err))
+		logger.Error(background, "server run error", zap.Error(err))
 	}
 	utils.PanicAndPrintIfNotNil(err)
 
-	logger.Logger().Info("server run success", zap.String("address", address))
+	logger.Info(background, "server run success", zap.String("address", address))
 }
 
 // initCommandLineFlag 初始化命令行参数

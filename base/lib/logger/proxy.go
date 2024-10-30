@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"context"
 	"io"
 )
 
@@ -18,6 +19,6 @@ func GetLoggerProxy() *Proxy {
 }
 
 func (p *Proxy) Write(data []byte) (n int, err error) {
-	Logger().Info(string(data))
+	Info(context.Background(), string(data))
 	return len(data), nil
 }

@@ -1,28 +1,25 @@
 package mysql
 
 import (
+	"context"
 	"errors"
-	"log"
-	"time"
-
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/plugin/dbresolver"
-
 	gormLogger "gorm.io/gorm/logger"
+	"gorm.io/plugin/dbresolver"
 
 	"go-web-template/base/lib/config"
 	"go-web-template/base/lib/logger"
 )
 
-func Init(dbConfigs map[string]config.DB) (map[string]gorm.DB, error) {
-	logger.Logger().Info("init mysql, config info: ", zap.Any("config", dbConfigs))
+func Init(ctx context.Context, dbConfigs map[string]config.DB) (map[string]gorm.DB, error) {
+	logger.Info(ctx, "init mysql, config info: ", zap.Any("config", dbConfigs))
 
 	result := make(map[string]gorm.DB, len(dbConfigs))
 
 	for dnName, dbConfig := range dbConfigs {
-		logger.Logger().Info("init single mysql connection, config info: ", zap.String("dnName", dnName), zap.Any("config", dbConfig))
+		logger.Info(ctx, "init single mysql connection, config info: ", zap.String("dnName", dnName), zap.Any("config", dbConfig))
 		if len(dbConfig.DSN) < 1 {
 			return result, errors.New("mysql config error, dsn is empty. db name: " + dnName)
 		}
@@ -33,20 +30,15 @@ func Init(dbConfigs map[string]config.DB) (map[string]gorm.DB, error) {
 		}
 
 		//主库，第一个配置为主库
+		customGormLogger := NewGormLogger(dbConfig.SlowThreshold)
+		customGormLogger.LogMode(dbLoggerLevel)
+
 		db, err := gorm.Open(mysql.Open(dbConfig.DSN[0]), &gorm.Config{
-			Logger: gormLogger.New(
-				log.New(logger.GetLoggerProxy(), "", log.LstdFlags),
-				gormLogger.Config{
-					SlowThreshold:             time.Second,
-					Colorful:                  false,
-					IgnoreRecordNotFoundError: true,
-					ParameterizedQueries:      true,
-					LogLevel:                  dbLoggerLevel,
-				}),
+			Logger: customGormLogger,
 		})
 
 		if err != nil {
-			logger.Logger().Error("init single mysql connection, error", zap.String("dnName", dnName), zap.Error(err))
+			logger.Error(ctx, "init single mysql connection, error", zap.String("dnName", dnName), zap.Error(err))
 			return result, err
 		}
 
@@ -82,13 +74,13 @@ func Init(dbConfigs map[string]config.DB) (map[string]gorm.DB, error) {
 
 		err = db.Use(plugin)
 		if err != nil {
-			logger.Logger().Error("init single mysql connection, error", zap.String("dnName", dnName), zap.Error(err))
+			logger.Error(ctx, "init single mysql connection, error", zap.String("dnName", dnName), zap.Error(err))
 			return result, err
 		}
 
 		result[dnName] = *db
 
-		logger.Logger().Info("init single mysql connection success", zap.String("dnName", dnName))
+		logger.Info(ctx, "init single mysql connection success", zap.String("dnName", dnName))
 	}
 
 	return result, nil

@@ -11,7 +11,7 @@ import (
 func PanicRecover() gin.HandlerFunc {
 	return gin.CustomRecovery(func(c *gin.Context, err interface{}) {
 		if err != nil {
-			logger.Logger().Error("CustomRecovery", zap.Any("err", err))
+			logger.Error(c.Request.Context(), "CustomRecovery", zap.Any("err", err))
 			c.JSON(http.StatusInternalServerError, "服务内部错误")
 			c.Abort()
 			return
