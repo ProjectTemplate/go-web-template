@@ -14,6 +14,8 @@ func TestParseConfig(t *testing.T) {
 	assert.NotNil(t, conf.LoggerConfig)
 
 	assert.Equal(t, "127.0.0.1:8080", conf.Server.Address)
+	assert.Equal(t, true, conf.Server.Debug)
+
 	assert.Equal(t, true, conf.LoggerConfig.Console)
 	assert.Equal(t, "DEBUG", conf.LoggerConfig.Level)
 	assert.Equal(t, "/var/log/go-web-template", conf.LoggerConfig.Path)

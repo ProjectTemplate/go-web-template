@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"go-web-template/base/lib/middleware"
 	"net/http"
 	"path/filepath"
 
@@ -28,22 +29,36 @@ func main() {
 
 	logger.Logger().Info("start server.", zap.String("confFile", confFile), zap.Any("configs", global.Configs))
 
-	gin.SetMode(gin.DebugMode)
+	ginMode := gin.ReleaseMode
+	if global.Configs.Server.Debug {
+		ginMode = gin.DebugMode
+	}
+	gin.SetMode(ginMode)
+
 	r := gin.New()
+	// 中间件处理
+	r.Use(middleware.PanicRecover())
+
 	r.GET("/ping", func(c *gin.Context) {
 		logger.Logger().Info("ping")
 		c.JSON(http.StatusOK, gin.H{"message": "pong"})
+	})
+
+	r.GET("/panic", func(c *gin.Context) {
+		panic("server panic")
 	})
 
 	address := ":8080"
 	if global.Configs != nil && global.Configs.Server.Address != "" {
 		address = global.Configs.Server.Address
 	}
+
 	err := r.Run(address)
 	if err != nil {
 		logger.Logger().Error("server run error", zap.Error(err))
 	}
 	utils.PanicAndPrintIfNotNil(err)
+
 	logger.Logger().Info("server run success", zap.String("address", address))
 }
 

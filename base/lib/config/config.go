@@ -15,6 +15,7 @@ type Configs struct {
 // Server 服务器配置
 type Server struct {
 	Address string `mapstructure:"address"`
+	Debug   bool   `mapstructure:"debug"`
 }
 
 // LoggerConfig 日志配置
