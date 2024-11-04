@@ -4,8 +4,8 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"go-web-template/base/lib/gin/response"
 	"go-web-template/base/lib/middleware"
-	"net/http"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
@@ -41,11 +41,13 @@ func main() {
 	r := gin.New()
 	// 中间件处理
 
-	r.Use(middleware.PanicRecover())
+	r.Use(middleware.PanicRecover(response.NewReason(response.AdminInternalErrorCode)))
 
 	r.GET("/ping", func(c *gin.Context) {
 		logger.Info(c.Request.Context(), "ping")
-		c.JSON(http.StatusOK, gin.H{"message": "pong"})
+		response.Success(c, struct {
+			Message string `json:"message"`
+		}{Message: "pong"})
 	})
 
 	r.GET("/panic", func(c *gin.Context) {
