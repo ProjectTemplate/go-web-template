@@ -7,6 +7,8 @@ import (
 )
 
 const (
+	// CodeLength 错误码长度
+	codeLengthCode = 4
 	// CodeLengthProjectModule 项目模块部分编码长度
 	codeLengthProjectModule = 3
 	// CodeLengthProject 项目部分编码长度
@@ -15,12 +17,10 @@ const (
 	codeLengthDepartment = 3
 	// CodeLengthCompany 公司部分长度
 	codeLengthCompany = 3
-	// CodeLength 错误码长度
-	codeLength = 4
 
 	// totalLength 总长度
-	totalLength        = codeLengthProjectModule + codeLengthProject + codeLengthDepartment + codeLengthCompany + codeLength
-	codeStart          = totalLength - codeLength
+	totalLength        = codeLengthProjectModule + codeLengthProject + codeLengthDepartment + codeLengthCompany + codeLengthCode
+	codeStart          = totalLength - codeLengthCode
 	projectModuleStart = codeStart - codeLengthProjectModule
 	projectStart       = projectModuleStart - codeLengthProject
 	departmentStart    = projectStart - codeLengthProject
@@ -30,17 +30,37 @@ const (
 const (
 	// CodeCommon 通用错误码
 	CodeCommon = "0000"
-	//CodeInternalError 内部错误
+	// CodeInternalError 内部错误
 	CodeInternalError = "0001"
 
-	//CodeParamError 参数错误
-	CodeParamError = "0002"
+	// CodeParamError 参数错误
+	CodeParamError = "1001"
+
+	// CodeDBError 数据库错误
+	CodeDBError = "1101"
+
+	// CodeKafKaError kafka错误
+	CodeKafKaError = "1201"
+
+	// CodeRedisError redis错误
+	CodeRedisError = "1301"
+
+	// CodeNacosError nacos错误
+	CodeNacosError = "1401"
+
+	// CodeESError ES错误
+	CodeESError = "1501"
 )
 
 var codeMessageMap = map[string]string{
 	CodeCommon:        "通用错误",
 	CodeInternalError: "内部错误",
 	CodeParamError:    "参数错误",
+	CodeDBError:       "数据库错误",
+	CodeKafKaError:    "kafka错误",
+	CodeRedisError:    "redis错误",
+	CodeNacosError:    "nacos错误",
+	CodeESError:       "ES错误",
 }
 
 var (
@@ -80,6 +100,7 @@ func NewCode(company, department, project, projectModule string) Code {
 	return code
 }
 
+// WithCode 设置错误码
 func (c Code) WithCode(code string) Code {
 	result := Code{
 		Department:    c.Department,
@@ -93,10 +114,12 @@ func (c Code) WithCode(code string) Code {
 	return result
 }
 
+// Encode 编码
 func (c Code) Encode() string {
 	return Encode(c)
 }
 
+// Encode 编码
 func Encode(c Code) string {
 	bufLength := totalLength
 	buffer := bytes.NewBuffer(make([]byte, 0, bufLength))
@@ -109,7 +132,7 @@ func Encode(c Code) string {
 	c.Project = utils.FillZero(c.Project, codeLengthProject)
 	c.Department = utils.FillZero(c.Department, codeLengthDepartment)
 	c.Company = utils.FillZero(c.Company, codeLengthCompany)
-	c.Code = utils.FillZero(c.Code, codeLengthCompany)
+	c.Code = utils.FillZero(c.Code, codeLengthCode)
 
 	buffer.WriteString(c.Company)
 	buffer.WriteString(c.Department)
@@ -120,11 +143,12 @@ func Encode(c Code) string {
 	return buffer.String()
 }
 
+// Decode 解码
 func Decode(code string) Code {
 	result := Code{}
 
 	if len(code) != totalLength {
-		utils.PanicAndPrintIfNotNil(errors.New("code length is illegal"))
+		panic(errors.New("code length is illegal"))
 	}
 
 	result.Code = code[codeStart:totalLength]
@@ -136,8 +160,9 @@ func Decode(code string) Code {
 	return result
 }
 
+// check 数据格式校验
 func check(c Code) error {
-	//数据格式校验
+
 	if len(c.ProjectModule) > codeLengthProjectModule {
 		return errors.New("project module length is illegal")
 	}
@@ -154,7 +179,7 @@ func check(c Code) error {
 		return errors.New("company length is illegal")
 	}
 
-	if len(c.Code) > codeLength {
+	if len(c.Code) > codeLengthCode {
 		return errors.New("code length is illegal")
 	}
 
