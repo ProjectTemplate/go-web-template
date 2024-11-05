@@ -34,4 +34,23 @@ func TestParseConfig(t *testing.T) {
 	assert.Equal(t, time.Minute*10, conf.DB["test"].MaxIdleTime)
 	assert.Equal(t, true, conf.DB["test"].IsLogger)
 	assert.Equal(t, time.Second, conf.DB["test"].SlowThreshold)
+
+	assert.NotEmpty(t, conf.Nacos)
+	assert.Equal(t, 2, len(conf.Nacos))
+	assert.Equal(t, "all", conf.Nacos["test"].ClientType)
+	assert.Equal(t, time.Second*10, conf.Nacos["test"].TimeOut)
+	assert.Equal(t, "info", conf.Nacos["test"].LogLevel)
+	assert.Equal(t, true, conf.Nacos["test"].AppendToStdout)
+	assert.Equal(t, "test", conf.Nacos["test"].Namespace)
+	assert.NotEmpty(t, conf.Nacos["test"].Servers)
+	assert.Equal(t, 2, len(conf.Nacos["test"].Servers))
+
+	assert.Equal(t, "all", conf.Nacos["test1"].ClientType)
+	assert.Equal(t, time.Second*10, conf.Nacos["test1"].TimeOut)
+	assert.Equal(t, "info", conf.Nacos["test1"].LogLevel)
+	assert.Equal(t, true, conf.Nacos["test1"].AppendToStdout)
+	assert.Equal(t, "test", conf.Nacos["test1"].Namespace)
+	assert.NotEmpty(t, conf.Nacos["test1"].Servers)
+	assert.Equal(t, 2, len(conf.Nacos["test1"].Servers))
+
 }

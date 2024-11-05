@@ -9,9 +9,10 @@ import (
 
 // Configs 配置信息
 type Configs struct {
-	Server       Server        `mapstructure:"server"`
-	LoggerConfig LoggerConfig  `mapstructure:"log"`
-	DB           map[string]DB `mapstructure:"db"`
+	Server       Server           `mapstructure:"server"`
+	LoggerConfig LoggerConfig     `mapstructure:"log"`
+	DB           map[string]DB    `mapstructure:"db"`
+	Nacos        map[string]Nacos `mapstructure:"nacos"`
 }
 
 // Server 服务器配置
@@ -47,6 +48,23 @@ type DB struct {
 	MaxIdleTime        time.Duration `mapstructure:"max_idle_time"`
 	IsLogger           bool          `mapstructure:"is_logger"`
 	SlowThreshold      time.Duration `mapstructure:"slow_threshold"`
+}
+
+// Nacos Nacos配置
+type Nacos struct {
+	// Type 客户端类型 config 配置客户端，naming 注册中心客户端，all 配置客户端和注册中心客户端
+	ClientType     string            `mapstructure:"client_type"`
+	TimeOut        time.Duration     `mapstructure:"time_out"`
+	LogLevel       string            `mapstructure:"log_level"`
+	AppendToStdout bool              `mapstructure:"append_to_stdout"`
+	Namespace      string            `mapstructure:"namespace"`
+	Servers        []NacosServerConf `mapstructure:"servers"`
+}
+
+// NacosServerConf NacosConf 连接配置
+type NacosServerConf struct {
+	IpAddr string `mapstructure:"ip_addr"`
+	Port   uint64 `mapstructure:"port"`
 }
 
 // Init 初始化配置

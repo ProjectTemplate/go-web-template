@@ -174,6 +174,7 @@ func SInfoF(ctx context.Context, msg string, args ...interface{}) {
 
 func SWarnF(ctx context.Context, msg string, args ...interface{}) {
 	checkNil()
+	loggerSugared.With("tag", "")
 	loggerSugared.Warnf(msg, args...)
 }
 

@@ -13,4 +13,5 @@ func TestFillZero(t *testing.T) {
 
 	assert.Equal(t, "012", FillZero("12", 3))
 	assert.Equal(t, "0012", FillZero("12", 4))
+	assert.Equal(t, "00012", FillZero("12", 5))
 }
