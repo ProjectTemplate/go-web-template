@@ -2,9 +2,11 @@ package nacos
 
 import (
 	"context"
+	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 	"github.com/stretchr/testify/assert"
 	"go-web-template/base/lib/config"
 	"go-web-template/base/lib/logger"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -25,14 +27,27 @@ func TestNacosCache(t *testing.T) {
 	cache.InitConfig(background, group, dataId, UnmarshalToNumber)
 
 	go func() {
-		for {
-			numberI := cache.GetConfig(background, group, dataId)
-			number, ok := numberI.(int)
-			assert.True(t, ok)
-			logger.SInfoF(background, "number:%v", number)
+		for i := 0; i < 10; i++ {
+			publishConfig, err := configClient.PublishConfig(vo.ConfigParam{
+				DataId:  dataId,
+				Group:   group,
+				Content: strconv.Itoa(i),
+			})
+			assert.Nil(t, err)
+			assert.True(t, publishConfig)
 			time.Sleep(time.Second)
 		}
 	}()
 
-	time.Sleep(time.Second * 10)
+	go func() {
+		for {
+			numberI := cache.GetConfig(background, group, dataId)
+			number, ok := numberI.(int)
+			assert.True(t, ok)
+			time.Sleep(time.Second)
+			logger.SInfoF(background, "number:%d", number)
+		}
+	}()
+
+	time.Sleep(time.Second * 15)
 }
