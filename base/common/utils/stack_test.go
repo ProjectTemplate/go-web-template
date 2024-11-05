@@ -28,3 +28,19 @@ func innerFunc(t *testing.T) {
 	callerMethodName := GetParentCallerMethodName()
 	assert.Equal(t, "innerFunc", callerMethodName)
 }
+
+// BenchmarkCallerStack 1593 ns/op
+// Warning 注意性能问题，不要滥用
+func BenchmarkGetParentCallerMethodName(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		GetParentCallerMethodName()
+	}
+}
+
+// BenchmarkEmpty 7.641 ns/op
+func BenchmarkEmpty(b *testing.B) {
+	data := make(map[string]string)
+	for i := 0; i < b.N; i++ {
+		data["a"] = "a"
+	}
+}
