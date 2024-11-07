@@ -19,7 +19,7 @@
     max_idle_connections = 25
     max_life_time = "1h"
     max_idle_time = "10m"
-    is_logger = true
+    show_log = true
     slow_threshold = "1s"
 
 [nacos.test]

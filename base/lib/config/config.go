@@ -46,7 +46,7 @@ type DB struct {
 	MaxIdleConnections int           `mapstructure:"max_idle_connections"`
 	MaxLifeTime        time.Duration `mapstructure:"max_life_time"`
 	MaxIdleTime        time.Duration `mapstructure:"max_idle_time"`
-	IsLogger           bool          `mapstructure:"is_logger"`
+	ShowLog            bool          `mapstructure:"show_log"`
 	SlowThreshold      time.Duration `mapstructure:"slow_threshold"`
 }
 

@@ -32,7 +32,7 @@ func TestParseConfig(t *testing.T) {
 	assert.Equal(t, 25, conf.DB["test"].MaxIdleConnections)
 	assert.Equal(t, time.Hour, conf.DB["test"].MaxLifeTime)
 	assert.Equal(t, time.Minute*10, conf.DB["test"].MaxIdleTime)
-	assert.Equal(t, true, conf.DB["test"].IsLogger)
+	assert.Equal(t, true, conf.DB["test"].ShowLog)
 	assert.Equal(t, time.Second, conf.DB["test"].SlowThreshold)
 
 	assert.NotEmpty(t, conf.Nacos)

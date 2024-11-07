@@ -19,7 +19,6 @@ type GormLogger struct {
 func NewGormLogger(slowThreshold time.Duration) *GormLogger {
 	return &GormLogger{
 		SlowThreshold: slowThreshold,
-		level:         logger.Info,
 	}
 }
 
@@ -33,10 +32,6 @@ func (g *GormLogger) Info(ctx context.Context, s string, i ...interface{}) {
 		return
 	}
 
-	if g.level > logger.Info {
-		return
-	}
-
 	localLogger.SInfoF(ctx, s, i)
 }
 
@@ -45,18 +40,11 @@ func (g *GormLogger) Warn(ctx context.Context, s string, i ...interface{}) {
 		return
 	}
 
-	if g.level > logger.Warn {
-		return
-	}
 	localLogger.SWarnF(ctx, s, i)
 }
 
 func (g *GormLogger) Error(ctx context.Context, s string, i ...interface{}) {
 	if g.level == logger.Silent {
-		return
-	}
-
-	if g.level > logger.Error {
 		return
 	}
 

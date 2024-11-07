@@ -24,14 +24,13 @@ func Init(ctx context.Context, dbConfigs map[string]config.DB) (map[string]gorm.
 			return result, errors.New("mysql config error, dsn is empty. db name: " + dnName)
 		}
 
-		dbLoggerLevel := gormLogger.Silent
-		if dbConfig.IsLogger {
-			dbLoggerLevel = gormLogger.Info
-		}
-
 		//主库，第一个配置为主库
 		customGormLogger := NewGormLogger(dbConfig.SlowThreshold)
-		customGormLogger.LogMode(dbLoggerLevel)
+		if !dbConfig.ShowLog {
+			customGormLogger.LogMode(gormLogger.Silent)
+		} else {
+			customGormLogger.LogMode(gormLogger.Info)
+		}
 
 		db, err := gorm.Open(mysql.Open(dbConfig.DSN[0]), &gorm.Config{
 			Logger: customGormLogger,

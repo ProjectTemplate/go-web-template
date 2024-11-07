@@ -16,5 +16,5 @@
     max_idle_connections = 25
     max_life_time = "1h"
     max_idle_time = "10m"
-    is_logger = false
+    show_log = false
     slow_threshold = "1ms"
