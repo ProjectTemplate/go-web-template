@@ -22,3 +22,6 @@ func (p *Writer) Write(data []byte) (n int, err error) {
 	Info(context.Background(), string(data))
 	return len(data), nil
 }
+
+type KafkaLogger struct {
+}

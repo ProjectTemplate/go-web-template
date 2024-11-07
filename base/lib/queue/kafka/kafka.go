@@ -46,6 +46,7 @@ func newPlaintextProducer(clusterConfig config.Kafka, ackConfig kafka.RequiredAc
 		Topic:        producerConfig.Topic,
 		RequiredAcks: ackConfig,
 		Balancer:     &kafka.Hash{},
+		Logger:       &kafkaLogger{},
 	}
 	return w
 }
@@ -84,6 +85,7 @@ func newPlaintextReader(clusterConfig config.Kafka, consumerConfig config.KafkaC
 		GroupID:        consumerConfig.Group,
 		Topic:          consumerConfig.Topic,
 		CommitInterval: consumerConfig.CommitInterval,
+		Logger:         &kafkaLogger{},
 	})
 	return reader
 }
