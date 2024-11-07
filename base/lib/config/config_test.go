@@ -61,4 +61,15 @@ func TestParseConfig(t *testing.T) {
 	assert.Equal(t, "127.0.0.1:6379", conf.Redis["test1"].Addr)
 	assert.Equal(t, "", conf.Redis["test1"].Password)
 	assert.Equal(t, 1, conf.Redis["test1"].DB)
+
+	assert.NotEmpty(t, conf.Kafka)
+	assert.Equal(t, 3, len(conf.Kafka))
+	assert.NotEmpty(t, conf.Kafka["test-plaintext"].Brokers)
+	assert.Equal(t, "plaintext", conf.Kafka["test-plaintext"].SecurityProtocol)
+
+	assert.NotEmpty(t, conf.Kafka["test-sasl_ssl"].Brokers)
+	assert.Equal(t, "sasl_ssl", conf.Kafka["test-sasl_ssl"].SecurityProtocol)
+
+	assert.NotEmpty(t, conf.Kafka["test-sasl_plaintext"].Brokers)
+	assert.Equal(t, "sasl_plaintext", conf.Kafka["test-sasl_plaintext"].SecurityProtocol)
 }

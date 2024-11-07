@@ -55,3 +55,49 @@
     addr = "127.0.0.1:6379"
     password = ""
     db = 1
+
+[kafka.test-plaintext]
+    brokers = "127.0.0.1:9092,127.0.0.1:9092"
+    security_protocol = "plaintext"
+    username = "a"
+    password = "b"
+[[kafka.test-plaintext.consumers]]
+    name = ""
+    topic = ""
+    group = ""
+    commit_interval = "1s"
+[[kafka.test-plaintext.producers]]
+    name = ""
+    topic = ""
+    ack_config = 1
+
+[kafka.test-sasl_ssl]
+    brokers = "127.0.0.1:9092,127.0.0.1:9092"
+    security_protocol = "sasl_ssl"
+    username = "a"
+    password = "b"
+    cert_data = "cerd_data"
+[[kafka.test-sasl_ssl.consumers]]
+    name = ""
+    topic = ""
+    group = ""
+    commit_interval = "2s"
+[[kafka.test-sasl_ssl.producers]]
+    name = ""
+    topic = ""
+    ack_config = 1
+
+[kafka.test-sasl_plaintext]
+    brokers = "127.0.0.1:9092,127.0.0.1:9092"
+    security_protocol = "sasl_plaintext"
+    username = "a"
+    password = "b"
+[[kafka.test-sasl_plaintext.consumers]]
+    name = ""
+    topic = ""
+    group = ""
+    commit_interval = "3s"
+[[kafka.test-sasl_plaintext.producers]]
+    name = ""
+    topic = ""
+    ack_config = 1

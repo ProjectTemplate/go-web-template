@@ -4,6 +4,15 @@ import (
 	"time"
 )
 
+const (
+	// SecurityProtocolPlaintext vpc 不需用户名密码
+	SecurityProtocolPlaintext = "plaintext"
+	// SecurityProtocolSaslSsl ssl 需要证书和用户名密码
+	SecurityProtocolSaslSsl = "sasl_ssl"
+	// SecurityProtocolSaslPlaintext 只需要用户名、密码
+	SecurityProtocolSaslPlaintext = "sasl_plaintext"
+)
+
 // Configs 配置信息
 type Configs struct {
 	Server       Server           `mapstructure:"server"`
@@ -11,6 +20,7 @@ type Configs struct {
 	DB           map[string]DB    `mapstructure:"db"`
 	Nacos        map[string]Nacos `mapstructure:"nacos"`
 	Redis        map[string]Redis `mapstructure:"redis"`
+	Kafka        map[string]Kafka `mapstructure:"kafka"`
 }
 
 // Server 服务器配置
@@ -70,4 +80,30 @@ type Nacos struct {
 type NacosServerConf struct {
 	IpAddr string `mapstructure:"ip_addr"`
 	Port   uint64 `mapstructure:"port"`
+}
+
+// Kafka kafka配置
+type Kafka struct {
+	Brokers          []string        `mapstructure:"brokers"`
+	SecurityProtocol string          `mapstructure:"security_protocol"`
+	Username         string          `mapstructure:"username"`
+	Password         string          `mapstructure:"password"`
+	CertData         string          `mapstructure:"cert_data"`
+	Consumers        []KafkaConsumer `mapstructure:"consumers"`
+	Producers        []KafkaProducer `mapstructure:"producers"`
+}
+
+// KafkaConsumer kafka消费者配置
+type KafkaConsumer struct {
+	Name           string        `mapstructure:"name"`
+	Topic          string        `mapstructure:"topic"`
+	Group          string        `mapstructure:"group"`
+	CommitInterval time.Duration `mapstructure:"commit_interval"`
+}
+
+// KafkaProducer kafka生产者配置
+type KafkaProducer struct {
+	Name      string `mapstructure:"name"`
+	Topic     string `mapstructure:"topic"`
+	AckConfig int    `mapstructure:"ack_config"`
 }
