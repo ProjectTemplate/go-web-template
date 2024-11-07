@@ -95,15 +95,24 @@ type Kafka struct {
 
 // KafkaConsumer kafka消费者配置
 type KafkaConsumer struct {
-	Name           string        `mapstructure:"name"`
-	Topic          string        `mapstructure:"topic"`
-	Group          string        `mapstructure:"group"`
+	Name  string `mapstructure:"name"`
+	Topic string `mapstructure:"topic"`
+	Group string `mapstructure:"group"`
+	// CommitInterval 0 表示同步提交
 	CommitInterval time.Duration `mapstructure:"commit_interval"`
 }
 
 // KafkaProducer kafka生产者配置
 type KafkaProducer struct {
-	Name      string `mapstructure:"name"`
-	Topic     string `mapstructure:"topic"`
-	AckConfig int    `mapstructure:"ack_config"`
+	Name  string `mapstructure:"name"`
+	Topic string `mapstructure:"topic"`
+
+	// AckConfig
+	//
+	// none 不等待确认
+	//
+	// one 等待leader确认
+	//
+	// all 等待所有在ISR里面的节点确认
+	AckConfig string `mapstructure:"ack_config"`
 }
