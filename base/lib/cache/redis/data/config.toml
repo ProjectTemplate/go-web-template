@@ -1,0 +1,21 @@
+[server]
+    address = "127.0.0.1:8080"
+    debug = true
+
+[log]
+    console = true
+    level = "DEBUG"
+    path = "./"
+    file_name = "server.log"
+    max_size = 100
+    max_backups = 30
+    max_age = 15
+
+[redis.test]
+    addr = "127.0.0.1:6379"
+    password = ""
+    db = 0
+[redis.test1]
+    addr = "127.0.0.1:6379"
+    password = ""
+    db = 1

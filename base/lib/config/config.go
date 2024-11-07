@@ -1,9 +1,6 @@
 package config
 
 import (
-	"fmt"
-	"github.com/mitchellh/mapstructure"
-	"github.com/spf13/viper"
 	"time"
 )
 
@@ -13,6 +10,7 @@ type Configs struct {
 	LoggerConfig LoggerConfig     `mapstructure:"log"`
 	DB           map[string]DB    `mapstructure:"db"`
 	Nacos        map[string]Nacos `mapstructure:"nacos"`
+	Redis        map[string]Redis `mapstructure:"redis"`
 }
 
 // Server 服务器配置
@@ -50,6 +48,13 @@ type DB struct {
 	SlowThreshold      time.Duration `mapstructure:"slow_threshold"`
 }
 
+// Redis Redis配置
+type Redis struct {
+	Addr     string `mapstructure:"addr"`
+	Password string `mapstructure:"password"`
+	DB       int    `mapstructure:"db"`
+}
+
 // Nacos Nacos配置
 type Nacos struct {
 	// Type 客户端类型 config 配置客户端，naming 注册中心客户端，all 配置客户端和注册中心客户端
@@ -65,30 +70,4 @@ type Nacos struct {
 type NacosServerConf struct {
 	IpAddr string `mapstructure:"ip_addr"`
 	Port   uint64 `mapstructure:"port"`
-}
-
-// Init 初始化配置
-func Init(configFile string, configStruct any) {
-	viper.SetConfigFile(configFile)
-
-	err := viper.ReadInConfig()
-	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
-
-	viperHookFunc := mapstructure.ComposeDecodeHookFunc(
-		// 字符串转时间 1s 1m 1h 1d
-		mapstructure.StringToTimeDurationHookFunc(),
-		// 字符串转字符串数组 1,2,3 => [1,2,3]
-		mapstructure.StringToSliceHookFunc(","),
-	)
-
-	err = viper.Unmarshal(configStruct, viper.DecodeHook(viperHookFunc))
-	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
-
-	fmt.Printf("config info, config path:%#v, config:%#v\n", configFile, configStruct)
 }

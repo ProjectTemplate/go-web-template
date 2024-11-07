@@ -53,4 +53,12 @@ func TestParseConfig(t *testing.T) {
 	assert.NotEmpty(t, conf.Nacos["test1"].Servers)
 	assert.Equal(t, 2, len(conf.Nacos["test1"].Servers))
 
+	assert.NotEmpty(t, conf.Redis)
+	assert.Equal(t, 2, len(conf.Redis))
+	assert.Equal(t, "127.0.0.1:6379", conf.Redis["test"].Addr)
+	assert.Equal(t, "", conf.Redis["test"].Password)
+	assert.Equal(t, 0, conf.Redis["test"].DB)
+	assert.Equal(t, "127.0.0.1:6379", conf.Redis["test1"].Addr)
+	assert.Equal(t, "", conf.Redis["test1"].Password)
+	assert.Equal(t, 1, conf.Redis["test1"].DB)
 }
