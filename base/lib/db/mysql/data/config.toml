@@ -7,15 +7,14 @@
     max_backups = 30
     max_age = 15
 
-[db]
-    [db.test]
-        dsn = [
-            "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8&loc=Local&parseTime=True",
-            "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8&loc=Local&parseTime=True"
-        ]
-        max_open_connections = 50
-        max_idle_connections = 25
-        max_life_time = "1h"
-        max_idle_time = "10m"
-        is_logger = false
-        slow_threshold = "1ms"
+[db.test]
+    dsn = [
+        "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8&loc=Local&parseTime=True",
+        "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8&loc=Local&parseTime=True"
+    ]
+    max_open_connections = 50
+    max_idle_connections = 25
+    max_life_time = "1h"
+    max_idle_time = "10m"
+    is_logger = false
+    slow_threshold = "1ms"
