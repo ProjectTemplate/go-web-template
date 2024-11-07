@@ -15,6 +15,9 @@ type testData struct {
 	StuId string `json:"stu_id"`
 }
 
+//go:generate go test -v -run="^TestPlaintext$" .
+//go:generate go test -v -run="^TestSaslPlaintextProducer$" .
+
 // TestPlaintext
 // 阿里云测试通过
 func TestPlaintext(t *testing.T) {
@@ -54,6 +57,7 @@ func TestPlaintext(t *testing.T) {
 
 // TestSaslSslProducer
 // 阿里云测试通过
+// 腾讯云测试通过
 func TestSaslSslProducer(t *testing.T) {
 	configStruct := &config.Configs{}
 	config.Init("./data/config.toml", configStruct)
@@ -89,6 +93,8 @@ func TestSaslSslProducer(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+// TestSaslPlaintextProducer
+// 腾讯云测试通过
 func TestSaslPlaintextProducer(t *testing.T) {
 	configStruct := &config.Configs{}
 	config.Init("./data/config.toml", configStruct)
