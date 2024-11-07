@@ -64,7 +64,7 @@ func TestNewTlsConfig(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, config)
 
-	config, err = NewTlsConfig(certData)
+	config, err = NewTlsConfig(tencentCertData)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, config)
