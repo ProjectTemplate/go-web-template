@@ -1,9 +1,11 @@
 package utils
 
-import "bytes"
+import (
+	"bytes"
+)
 
-// FillZero 填充0到字符串前面，直到字符串长度达到totalLength
-func FillZero(str string, totalLength int) string {
+// FillZeroToNumberString 填充0到字符串前面，直到字符串长度达到totalLength
+func FillZeroToNumberString(str string, totalLength int) string {
 	if len(str) >= totalLength {
 		return str
 	}

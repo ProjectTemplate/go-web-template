@@ -128,11 +128,11 @@ func Encode(c Code) string {
 	err := check(c)
 	utils.PanicAndPrintIfNotNil(err)
 
-	c.ProjectModule = utils.FillZero(c.ProjectModule, codeLengthProjectModule)
-	c.Project = utils.FillZero(c.Project, codeLengthProject)
-	c.Department = utils.FillZero(c.Department, codeLengthDepartment)
-	c.Company = utils.FillZero(c.Company, codeLengthCompany)
-	c.Code = utils.FillZero(c.Code, codeLengthCode)
+	c.ProjectModule = utils.FillZeroToNumberString(c.ProjectModule, codeLengthProjectModule)
+	c.Project = utils.FillZeroToNumberString(c.Project, codeLengthProject)
+	c.Department = utils.FillZeroToNumberString(c.Department, codeLengthDepartment)
+	c.Company = utils.FillZeroToNumberString(c.Company, codeLengthCompany)
+	c.Code = utils.FillZeroToNumberString(c.Code, codeLengthCode)
 
 	buffer.WriteString(c.Company)
 	buffer.WriteString(c.Department)

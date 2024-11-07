@@ -33,9 +33,10 @@ func TestNacosCache(t *testing.T) {
 				Group:   group,
 				Content: strconv.Itoa(i),
 			})
+			logger.SInfoF(background, "set number:%d", i)
 			assert.Nil(t, err)
 			assert.True(t, publishConfig)
-			time.Sleep(time.Second)
+			time.Sleep(time.Millisecond * 300)
 		}
 	}()
 
@@ -44,10 +45,14 @@ func TestNacosCache(t *testing.T) {
 			numberI := cache.GetConfig(background, group, dataId)
 			number, ok := numberI.(int)
 			assert.True(t, ok)
-			time.Sleep(time.Second)
 			logger.SInfoF(background, "number:%d", number)
+			time.Sleep(time.Millisecond * 500)
 		}
 	}()
 
-	time.Sleep(time.Second * 15)
+	time.Sleep(time.Second * 10)
+	numberI := cache.GetConfig(background, group, dataId)
+	number, ok := numberI.(int)
+	assert.True(t, ok)
+	assert.Equal(t, 9, number)
 }
