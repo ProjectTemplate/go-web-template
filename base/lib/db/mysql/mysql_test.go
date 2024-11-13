@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestGorm(t *testing.T) {
+func TestCount(t *testing.T) {
 	configStruct := &config.Configs{}
 	config.Init("./data/config.toml", configStruct)
 	logger.Init("TestGorm", configStruct.LoggerConfig)

@@ -12,15 +12,16 @@
     max_age = 15
 
 [mysql.test]
-    dsn = [
+    dsn = [  #数据源的连接信息，支持多个，第一个库为主库，其余的为只读库
+        "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8&loc=Local&parseTime=True",
         "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8&loc=Local&parseTime=True"
     ]
-    max_open_connections = 50
-    max_idle_connections = 25
-    max_life_time = "1h"
-    max_idle_time = "10m"
-    show_log = true
-    slow_threshold = "1s"
+    max_open_connections = 50 #最大打开的连接数
+    max_idle_connections = 25 #最大空闲的连接数
+    max_life_time = "1h"      #连接的最大生命周期
+    max_idle_time = "10m"     #连接的最大空闲时间
+    show_log = false          #是否显示sql日志
+    slow_threshold = "1ms"    #慢sql的阈值
 
 [nacos.test]
     client_type = "all" #config 配置客户端, naming 命名客户端, all 配置客户端和命名客户端
