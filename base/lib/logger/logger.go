@@ -7,7 +7,6 @@ import (
 	"os"
 	"path"
 	"strings"
-	"sync"
 	"time"
 
 	"go.uber.org/zap"
@@ -18,9 +17,6 @@ import (
 var (
 	logger        *zap.Logger
 	loggerSugared *zap.SugaredLogger
-
-	loggerProxy     *Writer
-	loggerProxyOnce sync.Once
 )
 
 const (

@@ -16,5 +16,4 @@ type kafkaLogger struct {
 func (k *kafkaLogger) Printf(s string, i ...interface{}) {
 	message := fmt.Sprintf(s, i...)
 	logger.Info(context.Background(), message, zap.String("tag", "kafka"))
-	logger.SInfoF(context.Background(), s, i...)
 }
