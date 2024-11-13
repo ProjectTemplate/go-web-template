@@ -66,10 +66,22 @@ func TestParseConfig(t *testing.T) {
 	assert.Equal(t, 3, len(conf.Kafka))
 	assert.NotEmpty(t, conf.Kafka["test-plaintext"].Brokers)
 	assert.Equal(t, "plaintext", conf.Kafka["test-plaintext"].SecurityProtocol)
+	assert.Equal(t, 1, len(conf.Kafka["test-plaintext"].Writers))
+	assert.Equal(t, 1, len(conf.Kafka["test-plaintext"].Readers))
+	assert.Equal(t, "test", conf.Kafka["test-plaintext"].Writers[0].Name)
+	assert.Equal(t, "test", conf.Kafka["test-plaintext"].Readers[0].Name)
 
 	assert.NotEmpty(t, conf.Kafka["test-sasl_ssl"].Brokers)
 	assert.Equal(t, "sasl_ssl", conf.Kafka["test-sasl_ssl"].SecurityProtocol)
+	assert.Equal(t, 1, len(conf.Kafka["test-sasl_ssl"].Writers))
+	assert.Equal(t, 1, len(conf.Kafka["test-sasl_ssl"].Readers))
+	assert.Equal(t, "test", conf.Kafka["test-sasl_ssl"].Writers[0].Name)
+	assert.Equal(t, "test", conf.Kafka["test-sasl_ssl"].Readers[0].Name)
 
 	assert.NotEmpty(t, conf.Kafka["test-sasl_plaintext"].Brokers)
 	assert.Equal(t, "sasl_plaintext", conf.Kafka["test-sasl_plaintext"].SecurityProtocol)
+	assert.Equal(t, 1, len(conf.Kafka["test-sasl_plaintext"].Writers))
+	assert.Equal(t, 1, len(conf.Kafka["test-sasl_plaintext"].Readers))
+	assert.Equal(t, "test", conf.Kafka["test-sasl_plaintext"].Writers[0].Name)
+	assert.Equal(t, "test", conf.Kafka["test-sasl_plaintext"].Readers[0].Name)
 }

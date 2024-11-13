@@ -20,8 +20,8 @@
     max_idle_connections = 25 #最大空闲的连接数
     max_life_time = "1h"      #连接的最大生命周期
     max_idle_time = "10m"     #连接的最大空闲时间
-    show_log = false          #是否显示sql日志
-    slow_threshold = "1ms"    #慢sql的阈值
+    show_log = true          #是否显示sql日志
+    slow_threshold = "1s"    #慢sql的阈值
 
 [nacos.test]
     client_type = "all" #config 配置客户端, naming 命名客户端, all 配置客户端和命名客户端
@@ -62,13 +62,13 @@
     security_protocol = "plaintext"
     username = "a"
     password = "b"
-[[kafka.test-plaintext.consumers]]
-    name = ""
+[[kafka.test-plaintext.readers]]
+    name = "test"
     topic = ""
     group = ""
     commit_interval = "1s"
-[[kafka.test-plaintext.producers]]
-    name = ""
+[[kafka.test-plaintext.writers]]
+    name = "test"
     topic = ""
     ack_config = "one"
 
@@ -97,13 +97,13 @@ DAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOBgQBTSz04p0AJXKl30sHw+UM/
 4H0ZSpUrMo2+6bfuNW9X35CFPp5vYYJqftilJBKIJX3C3J1ruOuBR28UxE42xx4K
 pQ70wChNi914c4B+SxkGUg==
 -----END CERTIFICATE-----"""
-[[kafka.test-sasl_ssl.consumers]]
-    name = ""
+[[kafka.test-sasl_ssl.readers]]
+    name = "test"
     topic = ""
     group = ""
     commit_interval = "2s"
-[[kafka.test-sasl_ssl.producers]]
-    name = ""
+[[kafka.test-sasl_ssl.writers]]
+    name = "test"
     topic = ""
     ack_config = "one"
 
@@ -112,12 +112,12 @@ pQ70wChNi914c4B+SxkGUg==
     security_protocol = "sasl_plaintext"
     username = "a"
     password = "b"
-[[kafka.test-sasl_plaintext.consumers]]
-    name = ""
+[[kafka.test-sasl_plaintext.readers]]
+    name = "test"
     topic = ""
     group = ""
     commit_interval = "3s"
-[[kafka.test-sasl_plaintext.producers]]
-    name = ""
+[[kafka.test-sasl_plaintext.writers]]
+    name = "test"
     topic = ""
     ack_config = "one"

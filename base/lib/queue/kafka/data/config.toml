@@ -14,12 +14,12 @@
 [kafka.test-plaintext]
     brokers = "127.0.0.1:9092,127.0.0.1:9092"
     security_protocol = "plaintext"
-[[kafka.test-plaintext.consumers]]
+[[kafka.test-plaintext.readers]]
     name = "test"
     topic = "demo_test"
     group = "demo_test"
     commit_interval = "2s"
-[[kafka.test-plaintext.producers]]
+[[kafka.test-plaintext.writers]]
     name = "test"
     topic = "demo_test"
     ack_config = "one"
@@ -61,12 +61,12 @@ Is5mA8fli6BIEKkAgE6Pn0t6v5EP6haVF84vJazYRIlYflR2mi8p8dU6kohiC79C
 e4seRTTZgyXU+5dgFIXqagub2A79tRtPAr+4Xi84jzY84ceUwqX2fxRwkfaUUJb8
 Hh2q+P+VJeK50B83DZ4ui+WNJbAaAbcLMsn/idX3
 -----END CERTIFICATE-----"""
-[[kafka.test-sasl_ssl.consumers]]
+[[kafka.test-sasl_ssl.readers]]
     name = "test"
     topic = "demo_test"
     group = "demo_test"
     commit_interval = "2s"
-[[kafka.test-sasl_ssl.producers]]
+[[kafka.test-sasl_ssl.writers]]
     name = "test"
     topic = "demo_test"
     ack_config = "one"
@@ -76,12 +76,12 @@ Hh2q+P+VJeK50B83DZ4ui+WNJbAaAbcLMsn/idX3
     security_protocol = "sasl_plaintext"
     username = ""
     password = ""
-[[kafka.test-sasl_plaintext.consumers]]
+[[kafka.test-sasl_plaintext.readers]]
     name = "test"
     topic = "demo_test"
     group = "demo_test"
     commit_interval = "2s"
-[[kafka.test-sasl_plaintext.producers]]
+[[kafka.test-sasl_plaintext.writers]]
     name = "test"
     topic = "demo_test"
     ack_config = "one"

@@ -84,17 +84,17 @@ type NacosServerConf struct {
 
 // Kafka kafka配置
 type Kafka struct {
-	Brokers          []string        `mapstructure:"brokers"`
-	SecurityProtocol string          `mapstructure:"security_protocol"`
-	Username         string          `mapstructure:"username"`
-	Password         string          `mapstructure:"password"`
-	CertData         string          `mapstructure:"cert_data"`
-	Consumers        []KafkaConsumer `mapstructure:"consumers"`
-	Producers        []KafkaProducer `mapstructure:"producers"`
+	Brokers          []string      `mapstructure:"brokers"`
+	SecurityProtocol string        `mapstructure:"security_protocol"`
+	Username         string        `mapstructure:"username"`
+	Password         string        `mapstructure:"password"`
+	CertData         string        `mapstructure:"cert_data"`
+	Readers          []KafkaReader `mapstructure:"readers"`
+	Writers          []KafkaWriter `mapstructure:"writers"`
 }
 
-// KafkaConsumer kafka消费者配置
-type KafkaConsumer struct {
+// KafkaReader kafka消费者配置
+type KafkaReader struct {
 	Name  string `mapstructure:"name"`
 	Topic string `mapstructure:"topic"`
 	Group string `mapstructure:"group"`
@@ -102,8 +102,8 @@ type KafkaConsumer struct {
 	CommitInterval time.Duration `mapstructure:"commit_interval"`
 }
 
-// KafkaProducer kafka生产者配置
-type KafkaProducer struct {
+// KafkaWriter kafka生产者配置
+type KafkaWriter struct {
 	Name  string `mapstructure:"name"`
 	Topic string `mapstructure:"topic"`
 
