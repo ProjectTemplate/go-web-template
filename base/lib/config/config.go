@@ -17,7 +17,7 @@ const (
 type Configs struct {
 	Server       Server           `mapstructure:"server"`
 	LoggerConfig LoggerConfig     `mapstructure:"log"`
-	DB           map[string]DB    `mapstructure:"db"`
+	Mysql        map[string]DB    `mapstructure:"mysql"`
 	Nacos        map[string]Nacos `mapstructure:"nacos"`
 	Redis        map[string]Redis `mapstructure:"redis"`
 	Kafka        map[string]Kafka `mapstructure:"kafka"`

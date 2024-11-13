@@ -57,8 +57,8 @@ func Init(ctx context.Context, nacosConfigs map[string]config.Nacos) Client {
 	for name, nacosConfig := range nacosConfigs {
 		clientType := nacosConfig.ClientType
 		if clientType != string(ClientTypeAll) && clientType != string(ClientTypeConfig) && clientType != string(ClientTypeNaming) {
-			logger.SErrorF(ctx, "Nacos Init, client type error. name: %s, config:%+v", name, nacosConfig)
-			panic("Init Nacos failed, client type error, type: " + clientType)
+			logger.SErrorF(ctx, "Nacos Init, client type error, client type must be [config naming all]. name: %s, config:%+v", name, nacosConfig)
+			panic("Init Nacos failed, client type error, client type must be [config naming all], type: " + clientType)
 		}
 
 		if clientType == string(ClientTypeAll) || clientType == string(ClientTypeConfig) {

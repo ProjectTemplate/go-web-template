@@ -2,26 +2,42 @@ package mysql
 
 import (
 	"context"
-	"errors"
+	"go-web-template/base/lib/config"
+	"go-web-template/base/lib/logger"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
 	"gorm.io/plugin/dbresolver"
-
-	"go-web-template/base/lib/config"
-	"go-web-template/base/lib/logger"
 )
 
-func Init(ctx context.Context, dbConfigs map[string]config.DB) (map[string]gorm.DB, error) {
-	logger.Info(ctx, "init mysql, config info: ", zap.Any("config", dbConfigs))
+// dbMap 存储初始化后的数据库实例
+var dbMap map[string]*gorm.DB
 
-	result := make(map[string]gorm.DB, len(dbConfigs))
+// GetDB 根据名字获取数据库连接（db.[name]），名字必须存在，否则会panic
+//
+// 如果获取失败，会打印错误日志，并且panic，通过 panic 提示错误配置
+func GetDB(name string) *gorm.DB {
+	db := dbMap[name]
+	if db == nil {
+		logger.Error(context.Background(), "GetDB error, db is nil", zap.String("name", name))
+		panic("GetDB error, db is nil")
+	}
+	return db
+}
+
+// Init 初始化数据库连接
+//
+// 在配置文件中 db.test.dsn 列表里面的第一个为主库，其余的为从库
+// 完整配置文件参考 ./data/config.toml 文件
+func Init(ctx context.Context, dbConfigs map[string]config.DB) {
+	logger.Info(ctx, "init MySQL, config info: ", zap.Any("config", dbConfigs))
+	dbMap = make(map[string]*gorm.DB)
 
 	for dnName, dbConfig := range dbConfigs {
 		logger.Info(ctx, "init single mysql connection, config info: ", zap.String("dnName", dnName), zap.Any("config", dbConfig))
 		if len(dbConfig.DSN) < 1 {
-			return result, errors.New("mysql config error, dsn is empty. db name: " + dnName)
+			panic("init MySQL config error, dsn is empty. db name: " + dnName)
 		}
 
 		//主库，第一个配置为主库
@@ -38,7 +54,7 @@ func Init(ctx context.Context, dbConfigs map[string]config.DB) (map[string]gorm.
 
 		if err != nil {
 			logger.Error(ctx, "init single mysql connection, error", zap.String("dnName", dnName), zap.Error(err))
-			return result, err
+			panic("init MySQL, init single mysql connection. db name: " + dnName + ", error: " + err.Error())
 		}
 
 		//从库，除了第一个库，其余的库为从库
@@ -74,13 +90,11 @@ func Init(ctx context.Context, dbConfigs map[string]config.DB) (map[string]gorm.
 		err = db.Use(plugin)
 		if err != nil {
 			logger.Error(ctx, "init single mysql connection, error", zap.String("dnName", dnName), zap.Error(err))
-			return result, err
+			panic("init MySQL, init single mysql connection. db name: " + dnName + ", error: " + err.Error())
 		}
 
-		result[dnName] = *db
+		dbMap[dnName] = db
 
 		logger.Info(ctx, "init single mysql connection success", zap.String("dnName", dnName))
 	}
-
-	return result, nil
 }

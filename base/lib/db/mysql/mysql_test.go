@@ -14,15 +14,13 @@ func TestGorm(t *testing.T) {
 	config.Init("./data/config.toml", configStruct)
 	logger.Init("TestGorm", configStruct.LoggerConfig)
 
-	dbMap, err := Init(context.Background(), configStruct.DB)
+	Init(context.Background(), configStruct.Mysql)
 
-	assert.Nil(t, err)
-	assert.NotNil(t, dbMap)
-	assert.NotNil(t, dbMap["test"])
+	db := GetDB("test")
+	assert.NotNil(t, db)
 
-	gormDB := dbMap["test"]
 	count := new(int64)
-	err = gormDB.Table("person").Count(count).Error
+	err := db.Table("person").Count(count).Error
 	assert.Nil(t, err)
 	fmt.Println("count: ", *count)
 }
@@ -32,14 +30,12 @@ func TestGormError(t *testing.T) {
 	config.Init("./data/config.toml", configStruct)
 	logger.Init("TestGormError", configStruct.LoggerConfig)
 
-	dbMap, err := Init(context.Background(), configStruct.DB)
+	Init(context.Background(), configStruct.Mysql)
+	db := GetDB("test")
 
-	assert.Nil(t, err)
-	assert.NotNil(t, dbMap)
-	assert.NotNil(t, dbMap["test"])
+	assert.NotNil(t, db)
 
-	gormDB := dbMap["test"]
 	count := new(int64)
-	err = gormDB.Exec("show tables").Count(count).Error
+	err := db.Exec("show tables").Count(count).Error
 	assert.NotNil(t, err)
 }
