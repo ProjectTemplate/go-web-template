@@ -54,6 +54,40 @@ func TestPlaintext(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+// TestSaslPlaintextWriter
+// 腾讯云测试通过
+func TestSaslPlaintextWriter(t *testing.T) {
+	configStruct := &config.Configs{}
+	config.Init("./data/config.toml", configStruct)
+	logger.Init("TestSaslPlaintextWriter", configStruct.LoggerConfig)
+	background := context.Background()
+
+	Init(background, configStruct.Kafka)
+
+	//写数据
+	writer := GetWriter(context.Background(), "test-sasl_plaintext", "test")
+
+	data := &testData{StuId: "1"}
+	marshalData, err := json.Marshal(data)
+	assert.Nil(t, err)
+
+	err = writer.WriteMessages(context.Background(), kafka.Message{
+		Value: marshalData,
+	})
+	assert.Nil(t, err)
+
+	time.Sleep(time.Second)
+
+	//读数据
+	reader := GetReader(context.Background(), "test-sasl_plaintext", "test")
+	message, err := reader.ReadMessage(context.Background())
+	assert.Nil(t, err)
+
+	data = &testData{}
+	err = json.Unmarshal(message.Value, data)
+	assert.Nil(t, err)
+}
+
 // TestSaslSslWriter
 // 阿里云测试通过
 // 腾讯云测试通过
@@ -81,40 +115,6 @@ func TestSaslSslWriter(t *testing.T) {
 	//读数据
 	reader := GetReader(context.Background(), "test-sasl_ssl", "test")
 
-	message, err := reader.ReadMessage(context.Background())
-	assert.Nil(t, err)
-
-	data = &testData{}
-	err = json.Unmarshal(message.Value, data)
-	assert.Nil(t, err)
-}
-
-// TestSaslPlaintextWriter
-// 腾讯云测试通过
-func TestSaslPlaintextWriter(t *testing.T) {
-	configStruct := &config.Configs{}
-	config.Init("./data/config.toml", configStruct)
-	logger.Init("TestSaslPlaintextWriter", configStruct.LoggerConfig)
-	background := context.Background()
-
-	Init(background, configStruct.Kafka)
-
-	//写数据
-	writer := GetWriter(context.Background(), "test-sasl_plaintext", "test")
-
-	data := &testData{StuId: "1"}
-	marshalData, err := json.Marshal(data)
-	assert.Nil(t, err)
-
-	err = writer.WriteMessages(context.Background(), kafka.Message{
-		Value: marshalData,
-	})
-	assert.Nil(t, err)
-
-	time.Sleep(time.Second)
-
-	//读数据
-	reader := GetReader(context.Background(), "test-sasl_plaintext", "test")
 	message, err := reader.ReadMessage(context.Background())
 	assert.Nil(t, err)
 

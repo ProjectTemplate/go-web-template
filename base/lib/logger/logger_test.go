@@ -26,7 +26,7 @@ func TestMultiSingle(t *testing.T) {
 
 	times := 1024
 	for i := 0; i < times; i++ {
-		SInfoF(context.Background(), "测试打印日志", "name", "name")
+		SInfoF(context.Background(), "测试打印日志,%s,%s", "name", "name")
 	}
 }
 

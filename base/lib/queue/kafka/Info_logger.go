@@ -17,13 +17,3 @@ func (k *kafkaInfoLogger) Printf(s string, i ...interface{}) {
 	message := fmt.Sprintf(s, i...)
 	logger.Info(context.Background(), message, zap.String("tag", "kafka"))
 }
-
-var _ kafka.Logger = (*kafkaErrorLogger)(nil)
-
-type kafkaErrorLogger struct {
-}
-
-func (k *kafkaErrorLogger) Printf(s string, i ...interface{}) {
-	message := fmt.Sprintf(s, i...)
-	logger.Error(context.Background(), message, zap.String("tag", "kafka"))
-}

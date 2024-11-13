@@ -2,6 +2,7 @@ package kafka
 
 import (
 	"context"
+	"errors"
 	"github.com/segmentio/kafka-go"
 	"go-web-template/base/lib/logger"
 	"go.uber.org/zap"
@@ -63,6 +64,12 @@ func GetReader(ctx context.Context, clusterName string, readerName string) *kafk
 	return kafka.NewReader(*readerConfig)
 }
 
+// Init 初始化kafka
+// 支持三种连接方式，分别是 plaintext、sasl_ssl和sasl_plaintext
+// plaintext 不需要用户密码
+// sasl_plaintext 需要用户名和密码
+// sasl_ssl 需要证书、用户名和密码
+// 详细配置信息课参考配置文件
 func Init(ctx context.Context, kafkaConfigs map[string]config.Kafka) {
 	if len(kafkaConfigs) == 0 {
 		logger.Info(ctx, "Init Kafka, configs is empty")
@@ -110,15 +117,19 @@ func newWriter(clusterConfig config.Kafka, writerConfig config.KafkaWriter) (*ka
 		ackConfig = kafka.RequireOne
 	}
 
-	if clusterConfig.SecurityProtocol == config.SecurityProtocolSaslSsl {
-		return newSaslSslWriter(clusterConfig, ackConfig, writerConfig)
-	}
-
 	if clusterConfig.SecurityProtocol == config.SecurityProtocolSaslPlaintext {
 		return newSaslPlaintextWriter(clusterConfig, ackConfig, writerConfig), nil
 	}
 
-	return newPlaintextWriter(clusterConfig, ackConfig, writerConfig), nil
+	if clusterConfig.SecurityProtocol == config.SecurityProtocolSaslSsl {
+		return newSaslSslWriter(clusterConfig, ackConfig, writerConfig)
+	}
+
+	if clusterConfig.SecurityProtocol == config.SecurityProtocolPlaintext {
+		return newPlaintextWriter(clusterConfig, ackConfig, writerConfig), nil
+	}
+
+	return nil, errors.New("unsupported security protocol, protocol:" + clusterConfig.SecurityProtocol)
 }
 
 func newReader(clusterConfig config.Kafka, readerConfig config.KafkaReader) (*kafka.ReaderConfig, error) {
@@ -145,6 +156,17 @@ func newPlaintextWriter(clusterConfig config.Kafka, ackConfig kafka.RequiredAcks
 	return w
 }
 
+func newSaslPlaintextWriter(clusterConfig config.Kafka, ackConfig kafka.RequiredAcks, writerConfig config.KafkaWriter) *kafka.Writer {
+	writer := newPlaintextWriter(clusterConfig, ackConfig, writerConfig)
+	writer.Transport = &kafka.Transport{
+		SASL: plain.Mechanism{
+			Username: clusterConfig.Username,
+			Password: clusterConfig.Password,
+		},
+	}
+	return writer
+}
+
 func newSaslSslWriter(clusterConfig config.Kafka, ackConfig kafka.RequiredAcks, writerConfig config.KafkaWriter) (*kafka.Writer, error) {
 	tlsConfig, err := utils.NewTlsConfig(clusterConfig.CertData)
 	if err != nil {
@@ -162,17 +184,6 @@ func newSaslSslWriter(clusterConfig config.Kafka, ackConfig kafka.RequiredAcks, 
 	return writer, nil
 }
 
-func newSaslPlaintextWriter(clusterConfig config.Kafka, ackConfig kafka.RequiredAcks, writerConfig config.KafkaWriter) *kafka.Writer {
-	writer := newPlaintextWriter(clusterConfig, ackConfig, writerConfig)
-	writer.Transport = &kafka.Transport{
-		SASL: plain.Mechanism{
-			Username: clusterConfig.Username,
-			Password: clusterConfig.Password,
-		},
-	}
-	return writer
-}
-
 func newReaderConfig(clusterConfig config.Kafka, readerConfig config.KafkaReader) *kafka.ReaderConfig {
 	return &kafka.ReaderConfig{
 		Brokers:        clusterConfig.Brokers,
@@ -186,6 +197,22 @@ func newReaderConfig(clusterConfig config.Kafka, readerConfig config.KafkaReader
 
 func newPlaintextReader(clusterConfig config.Kafka, readerConfig config.KafkaReader) *kafka.ReaderConfig {
 	return newReaderConfig(clusterConfig, readerConfig)
+}
+
+func newSaslPlaintextReader(clusterConfig config.Kafka, readerConfig config.KafkaReader) *kafka.ReaderConfig {
+	dialer := &kafka.Dialer{
+		Timeout:   5 * time.Second,
+		DualStack: true,
+		SASLMechanism: plain.Mechanism{
+			Username: clusterConfig.Username,
+			Password: clusterConfig.Password,
+		},
+	}
+
+	result := newReaderConfig(clusterConfig, readerConfig)
+	result.Dialer = dialer
+
+	return result
 }
 
 func newSaslSslReader(clusterConfig config.Kafka, readerConfig config.KafkaReader) (*kafka.ReaderConfig, error) {
@@ -208,20 +235,4 @@ func newSaslSslReader(clusterConfig config.Kafka, readerConfig config.KafkaReade
 	result.Dialer = dialer
 
 	return result, nil
-}
-
-func newSaslPlaintextReader(clusterConfig config.Kafka, readerConfig config.KafkaReader) *kafka.ReaderConfig {
-	dialer := &kafka.Dialer{
-		Timeout:   5 * time.Second,
-		DualStack: true,
-		SASLMechanism: plain.Mechanism{
-			Username: clusterConfig.Username,
-			Password: clusterConfig.Password,
-		},
-	}
-
-	result := newReaderConfig(clusterConfig, readerConfig)
-	result.Dialer = dialer
-
-	return result
 }
