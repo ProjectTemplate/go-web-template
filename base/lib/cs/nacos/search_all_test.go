@@ -15,8 +15,8 @@ func TestSearchAll(t *testing.T) {
 
 	// Test SearchConfigInGroup
 	background := context.Background()
-	client := Init(background, configStruct.Nacos)
-	configClient := client.configClients["test"]
+	Init(background, configStruct.Nacos)
+	configClient := GetConfigClient(background, "test")
 
 	configItems, err := SearchConfigInGroup(background, "test", configClient)
 

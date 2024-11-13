@@ -14,9 +14,7 @@ import (
 // dbMap 存储初始化后的数据库实例
 var dbMap map[string]*gorm.DB
 
-// GetDB 根据名字获取数据库连接（mysql.[name]），名字必须存在，否则会panic
-//
-// 如果获取失败，会打印错误日志，并且panic，通过 panic 提示错误配置
+// GetDB 根据别名获取数据库连接，别名必须存在，否则会panic
 func GetDB(ctx context.Context, name string) *gorm.DB {
 	db := dbMap[name]
 	if db == nil {
@@ -29,7 +27,7 @@ func GetDB(ctx context.Context, name string) *gorm.DB {
 // Init 根据配置信息初始化数据库连接，如果初始化失败会 panic，所以要确保配置信息都是正确的
 //
 // 配置信息说明
-// 前缀 mysql 为固定前缀，后面的 test 为数据库连接的别名，可以自定义，后面通过 GETDB("test") 获取
+// 前缀 mysql 为固定前缀，后面的 test 为数据库连接的别名，GetDB方法使用别名获取对应的连接
 // [mysql.test]
 //
 //	dsn = [#数据源的连接信息，支持多个，第一个库为主库，其余的为只读库

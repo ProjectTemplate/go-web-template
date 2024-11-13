@@ -2,8 +2,9 @@ package nacos
 
 import (
 	"context"
-
 	"github.com/nacos-group/nacos-sdk-go/v2/clients"
+	"go.uber.org/zap"
+
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/config_client"
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/naming_client"
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
@@ -37,6 +38,28 @@ const (
 	ClientTypeAll ClientType = "all"
 )
 
+var cli *Client
+
+// GetConfigClient 根据名字获取配置客户端，如果不存在则panic
+func GetConfigClient(ctx context.Context, name string) config_client.IConfigClient {
+	configClient := cli.configClients[name]
+	if configClient == nil {
+		logger.Error(ctx, "GetConfigClient, config client not found", zap.String("name", name))
+		panic("GetConfigClient, config client not found, name: " + name)
+	}
+	return configClient
+}
+
+// GetNamingClient 根据名字获取命名客户端，如果不存在则panic
+func GetNamingClient(ctx context.Context, name string) naming_client.INamingClient {
+	namingClient := cli.namingClients[name]
+	if namingClient == nil {
+		logger.Error(ctx, "GetNamingClient, naming client not found", zap.String("name", name))
+		panic("GetNamingClient, naming client not found, name: " + name)
+	}
+	return namingClient
+}
+
 type ClientType string
 
 // Client nacos客户端
@@ -46,10 +69,10 @@ type Client struct {
 }
 
 // Init 初始化nacos客户端
-func Init(ctx context.Context, nacosConfigs map[string]config.Nacos) Client {
-	logger.SInfoF(ctx, "Nacos Init start, nacos configs: %+v", nacosConfigs)
+func Init(ctx context.Context, nacosConfigs map[string]config.Nacos) {
+	logger.SInfoF(ctx, "Init Nacos start, nacos configs: %+v", nacosConfigs)
 
-	client := Client{
+	cli = &Client{
 		configClients: make(map[string]config_client.IConfigClient),
 		namingClients: make(map[string]naming_client.INamingClient),
 	}
@@ -57,7 +80,7 @@ func Init(ctx context.Context, nacosConfigs map[string]config.Nacos) Client {
 	for name, nacosConfig := range nacosConfigs {
 		clientType := nacosConfig.ClientType
 		if clientType != string(ClientTypeAll) && clientType != string(ClientTypeConfig) && clientType != string(ClientTypeNaming) {
-			logger.SErrorF(ctx, "Nacos Init, client type error, client type must be [config naming all]. name: %s, config:%+v", name, nacosConfig)
+			logger.SErrorF(ctx, "Init Nacos, client type error, client type must be [config naming all]. name: %s, config:%+v", name, nacosConfig)
 			panic("Init Nacos failed, client type error, client type must be [config naming all], type: " + clientType)
 		}
 
@@ -67,22 +90,20 @@ func Init(ctx context.Context, nacosConfigs map[string]config.Nacos) Client {
 				logger.SErrorF(ctx, "Nacos Init, new config client failed. name: %s, config:%+v err: %v", name, nacosConfig, err)
 				panic("Init Nacos failed, err:" + err.Error())
 			}
-			client.configClients[name] = configClient
+			cli.configClients[name] = configClient
 		}
 
 		if clientType == string(ClientTypeAll) || clientType == string(ClientTypeNaming) {
 			namingClient, err := newNamingClient(ctx, nacosConfig)
 			if err != nil {
-				logger.SErrorF(ctx, "Nacos Init, new config client failed. name: %s, config:%+v err: %v", name, nacosConfig, err)
+				logger.SErrorF(ctx, "Init Nacos, new config client failed. name: %s, config:%+v err: %v", name, nacosConfig, err)
 				panic("Init Nacos failed, err:" + err.Error())
 			}
-			client.namingClients[name] = namingClient
+			cli.namingClients[name] = namingClient
 		}
 
-		logger.SInfoF(ctx, "Nacos Init success, name: %s, config:%+v", name, nacosConfig)
+		logger.SInfoF(ctx, "Init Nacos success, name: %s, config:%+v", name, nacosConfig)
 	}
-
-	return client
 }
 
 // newConfigClient 创建配置客户端

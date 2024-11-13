@@ -12,10 +12,10 @@
     max_age = 15
 
 [redis.test]
-    addr = "127.0.0.1:6379"
-    password = ""
-    db = 0
+    addr = "127.0.0.1:6379" #连接地址
+    password = ""           #密码
+    db = 0                  #数据库
 [redis.test1]
-    addr = "127.0.0.1:6379"
-    password = ""
-    db = 1
+    addr = "127.0.0.1:6379" #连接地址
+    password = ""           #密码
+    db = 1                  #数据库

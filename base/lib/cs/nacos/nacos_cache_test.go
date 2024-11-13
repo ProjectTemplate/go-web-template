@@ -17,8 +17,8 @@ func TestNacosCache(t *testing.T) {
 	logger.Init("TestNacosCache", configStruct.LoggerConfig)
 
 	background := context.Background()
-	client := Init(background, configStruct.Nacos)
-	configClient := client.configClients["test"]
+	Init(background, configStruct.Nacos)
+	configClient := GetConfigClient(background, "test")
 
 	cache := NewConfigCache(configClient)
 

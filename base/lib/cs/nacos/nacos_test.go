@@ -15,9 +15,9 @@ func TestConnection(t *testing.T) {
 	logger.Init("TestNacos", configStruct.LoggerConfig)
 
 	background := context.Background()
-	client := Init(background, configStruct.Nacos)
+	Init(background, configStruct.Nacos)
 
-	configClient := client.configClients["test"]
+	configClient := GetConfigClient(background, "test")
 
 	configData, err := configClient.GetConfig(vo.ConfigParam{
 		Group:  "test",
@@ -27,7 +27,7 @@ func TestConnection(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "test", configData)
 
-	namingClient := client.namingClients["test1"]
+	namingClient := GetNamingClient(background, "test1")
 	instance, err := namingClient.RegisterInstance(vo.RegisterInstanceParam{
 		ServiceName: "test",
 		Ip:          "127.0.0.1",
