@@ -16,7 +16,8 @@ type testData struct {
 }
 
 //go:generate go test -v -run="^TestPlaintext$" .
-//go:generate go test -v -run="^TestSaslPlaintextProducer$" .
+//go:generate go test -v -run="^TestSaslSslWriter$" .
+//go:generate go test -v -run="^TestSaslPlaintextWriter$" .
 
 // TestPlaintext
 // 阿里云测试通过
@@ -53,13 +54,13 @@ func TestPlaintext(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-// TestSaslSslProducer
+// TestSaslSslWriter
 // 阿里云测试通过
 // 腾讯云测试通过
-func TestSaslSslProducer(t *testing.T) {
+func TestSaslSslWriter(t *testing.T) {
 	configStruct := &config.Configs{}
 	config.Init("./data/config.toml", configStruct)
-	logger.Init("TestSaslSslProducer", configStruct.LoggerConfig)
+	logger.Init("TestSaslSslWriter", configStruct.LoggerConfig)
 	background := context.Background()
 
 	Init(background, configStruct.Kafka)
@@ -88,12 +89,12 @@ func TestSaslSslProducer(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-// TestSaslPlaintextProducer
+// TestSaslPlaintextWriter
 // 腾讯云测试通过
-func TestSaslPlaintextProducer(t *testing.T) {
+func TestSaslPlaintextWriter(t *testing.T) {
 	configStruct := &config.Configs{}
 	config.Init("./data/config.toml", configStruct)
-	logger.Init("TestSaslSslProducer", configStruct.LoggerConfig)
+	logger.Init("TestSaslPlaintextWriter", configStruct.LoggerConfig)
 	background := context.Background()
 
 	Init(background, configStruct.Kafka)
@@ -135,5 +136,5 @@ func TestInit(t *testing.T) {
 
 	reader := GetReader(background, "test-sasl_plaintext", "test")
 	assert.NotNil(t, reader)
-	time.Sleep(time.Hour)
+	time.Sleep(time.Second * 5)
 }
