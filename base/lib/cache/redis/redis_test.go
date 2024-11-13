@@ -15,16 +15,15 @@ func TestRedis(t *testing.T) {
 	logger.Init("TestRedis", configs.LoggerConfig)
 
 	background := context.Background()
-	clients := Init(background, configs.Redis)
-	assert.Equal(t, len(configs.Redis), len(clients))
+	Init(background, configs.Redis)
 
-	c := clients["test"]
+	c := GetClient(background, "test")
 	ping := c.Ping(background)
 
 	assert.Nil(t, ping.Err())
 	assert.Equal(t, "PONG", ping.Val())
 
-	c1 := clients["test1"]
+	c1 := GetClient(background, "test1")
 	c1.Set(background, "testKey", "0000000000000000000000000000000000000000000000000000000000000000", time.Second*10)
 	usage := c1.MemoryUsage(background, "testKey")
 	assert.Nil(t, usage.Err())

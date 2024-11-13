@@ -17,10 +17,10 @@ var dbMap map[string]*gorm.DB
 // GetDB 根据名字获取数据库连接（mysql.[name]），名字必须存在，否则会panic
 //
 // 如果获取失败，会打印错误日志，并且panic，通过 panic 提示错误配置
-func GetDB(name string) *gorm.DB {
+func GetDB(ctx context.Context, name string) *gorm.DB {
 	db := dbMap[name]
 	if db == nil {
-		logger.Error(context.Background(), "GetDB error, db is nil", zap.String("name", name))
+		logger.Error(ctx, "GetDB error, db is nil", zap.String("name", name))
 		panic("GetDB error, db is nil")
 	}
 	return db
