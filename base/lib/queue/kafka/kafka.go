@@ -17,7 +17,7 @@ var kafkaClusters map[string]*kafkaWriterReader
 
 type kafkaWriterReader struct {
 	writers map[string]*kafka.Writer
-	readers map[string]*kafka.Reader
+	readers map[string]*kafka.ReaderConfig
 }
 
 func GetWriter(ctx context.Context, clusterName string, writerName string) *kafka.Writer {
@@ -53,13 +53,13 @@ func GetReader(ctx context.Context, clusterName string, readerName string) *kafk
 		panic("GetReader, cluster not found, cluster name:" + clusterName)
 	}
 
-	reader, ok := cluster.readers[readerName]
+	readerConfig, ok := cluster.readers[readerName]
 	if !ok {
 		logger.Info(ctx, "GetReader, reader not found", zap.String("clusterName", clusterName), zap.String("readerName", readerName))
 		panic("GetReader, reader not found, reader name:" + readerName)
 	}
 
-	return reader
+	return kafka.NewReader(*readerConfig)
 }
 
 func Init(ctx context.Context, kafkaConfigs map[string]config.Kafka) {
@@ -73,7 +73,7 @@ func Init(ctx context.Context, kafkaConfigs map[string]config.Kafka) {
 		logger.Info(ctx, "Init Kafka, infos", zap.String("clusterName", clusterName), zap.Any("clusterConfig", clusterConfig))
 		writerReaders := &kafkaWriterReader{
 			writers: make(map[string]*kafka.Writer),
-			readers: make(map[string]*kafka.Reader),
+			readers: make(map[string]*kafka.ReaderConfig),
 		}
 
 		// 消费者初始化
@@ -120,7 +120,7 @@ func newWriter(clusterConfig config.Kafka, producerConfig config.KafkaProducer) 
 	return newPlaintextProducer(clusterConfig, ackConfig, producerConfig), nil
 }
 
-func newReader(clusterConfig config.Kafka, consumerConfig config.KafkaConsumer) (*kafka.Reader, error) {
+func newReader(clusterConfig config.Kafka, consumerConfig config.KafkaConsumer) (*kafka.ReaderConfig, error) {
 	if clusterConfig.SecurityProtocol == config.SecurityProtocolSaslSsl {
 		return newSaslSslReader(clusterConfig, consumerConfig)
 	}
@@ -138,7 +138,8 @@ func newPlaintextProducer(clusterConfig config.Kafka, ackConfig kafka.RequiredAc
 		Topic:        producerConfig.Topic,
 		RequiredAcks: ackConfig,
 		Balancer:     &kafka.Hash{},
-		Logger:       &kafkaLogger{},
+		Logger:       &kafkaInfoLogger{},
+		ErrorLogger:  &kafkaErrorLogger{},
 	}
 	return w
 }
@@ -171,18 +172,22 @@ func newSaslPlaintextProducer(clusterConfig config.Kafka, ackConfig kafka.Requir
 	return producer
 }
 
-func newPlaintextReader(clusterConfig config.Kafka, consumerConfig config.KafkaConsumer) *kafka.Reader {
-	reader := kafka.NewReader(kafka.ReaderConfig{
+func newReaderConfig(clusterConfig config.Kafka, consumerConfig config.KafkaConsumer) *kafka.ReaderConfig {
+	return &kafka.ReaderConfig{
 		Brokers:        clusterConfig.Brokers,
 		GroupID:        consumerConfig.Group,
 		Topic:          consumerConfig.Topic,
 		CommitInterval: consumerConfig.CommitInterval,
-		Logger:         &kafkaLogger{},
-	})
-	return reader
+		Logger:         &kafkaInfoLogger{},
+		ErrorLogger:    &kafkaErrorLogger{},
+	}
 }
 
-func newSaslSslReader(clusterConfig config.Kafka, consumerConfig config.KafkaConsumer) (*kafka.Reader, error) {
+func newPlaintextReader(clusterConfig config.Kafka, consumerConfig config.KafkaConsumer) *kafka.ReaderConfig {
+	return newReaderConfig(clusterConfig, consumerConfig)
+}
+
+func newSaslSslReader(clusterConfig config.Kafka, consumerConfig config.KafkaConsumer) (*kafka.ReaderConfig, error) {
 	tlsConfig, err := utils.NewTlsConfig(clusterConfig.CertData)
 	if err != nil {
 		return nil, err
@@ -198,18 +203,13 @@ func newSaslSslReader(clusterConfig config.Kafka, consumerConfig config.KafkaCon
 		},
 	}
 
-	reader := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:        clusterConfig.Brokers,
-		GroupID:        consumerConfig.Group,
-		Topic:          consumerConfig.Topic,
-		CommitInterval: consumerConfig.CommitInterval,
-		Dialer:         dialer,
-	})
+	readerConfig := newReaderConfig(clusterConfig, consumerConfig)
+	readerConfig.Dialer = dialer
 
-	return reader, nil
+	return readerConfig, nil
 }
 
-func newSaslPlaintextReader(clusterConfig config.Kafka, consumerConfig config.KafkaConsumer) *kafka.Reader {
+func newSaslPlaintextReader(clusterConfig config.Kafka, consumerConfig config.KafkaConsumer) *kafka.ReaderConfig {
 	dialer := &kafka.Dialer{
 		Timeout:   5 * time.Second,
 		DualStack: true,
@@ -219,13 +219,8 @@ func newSaslPlaintextReader(clusterConfig config.Kafka, consumerConfig config.Ka
 		},
 	}
 
-	reader := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:        clusterConfig.Brokers,
-		GroupID:        consumerConfig.Group,
-		Topic:          consumerConfig.Topic,
-		CommitInterval: consumerConfig.CommitInterval,
-		Dialer:         dialer,
-	})
+	readerConfig := newReaderConfig(clusterConfig, consumerConfig)
+	readerConfig.Dialer = dialer
 
-	return reader
+	return readerConfig
 }
