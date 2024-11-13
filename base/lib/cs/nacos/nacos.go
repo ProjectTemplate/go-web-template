@@ -38,7 +38,15 @@ const (
 	ClientTypeAll ClientType = "all"
 )
 
-var cli *Client
+var cli *client
+
+type ClientType string
+
+// Client nacos客户端
+type client struct {
+	configClients map[string]config_client.IConfigClient
+	namingClients map[string]naming_client.INamingClient
+}
 
 // GetConfigClient 根据名字获取配置客户端，如果不存在则panic
 func GetConfigClient(ctx context.Context, name string) config_client.IConfigClient {
@@ -60,19 +68,11 @@ func GetNamingClient(ctx context.Context, name string) naming_client.INamingClie
 	return namingClient
 }
 
-type ClientType string
-
-// Client nacos客户端
-type Client struct {
-	configClients map[string]config_client.IConfigClient
-	namingClients map[string]naming_client.INamingClient
-}
-
 // Init 初始化nacos客户端
 func Init(ctx context.Context, nacosConfigs map[string]config.Nacos) {
 	logger.SInfoF(ctx, "Init Nacos start, nacos configs: %+v", nacosConfigs)
 
-	cli = &Client{
+	cli = &client{
 		configClients: make(map[string]config_client.IConfigClient),
 		namingClients: make(map[string]naming_client.INamingClient),
 	}

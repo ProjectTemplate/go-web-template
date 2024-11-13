@@ -28,7 +28,7 @@ func TestPlaintext(t *testing.T) {
 	kafkaConfig := configStruct.Kafka["test-plaintext"]
 
 	//写数据
-	writer, err := NewWriter(kafkaConfig, kafkaConfig.Producers[0])
+	writer, err := newWriter(kafkaConfig, kafkaConfig.Producers[0])
 	assert.Nil(t, err)
 
 	data := &testData{StuId: "1"}
@@ -44,7 +44,7 @@ func TestPlaintext(t *testing.T) {
 	time.Sleep(time.Second)
 
 	//读数据
-	reader, err := NewReader(kafkaConfig, kafkaConfig.Consumers[0])
+	reader, err := newReader(kafkaConfig, kafkaConfig.Consumers[0])
 	assert.Nil(t, err)
 
 	message, err := reader.ReadMessage(context.Background())
@@ -66,7 +66,7 @@ func TestSaslSslProducer(t *testing.T) {
 	kafkaConfig := configStruct.Kafka["test-sasl_ssl"]
 
 	//写数据
-	writer, err := NewWriter(kafkaConfig, kafkaConfig.Producers[0])
+	writer, err := newWriter(kafkaConfig, kafkaConfig.Producers[0])
 	assert.Nil(t, err)
 
 	data := &testData{StuId: "1"}
@@ -82,7 +82,7 @@ func TestSaslSslProducer(t *testing.T) {
 	time.Sleep(time.Second)
 
 	//读数据
-	reader, err := NewReader(kafkaConfig, kafkaConfig.Consumers[0])
+	reader, err := newReader(kafkaConfig, kafkaConfig.Consumers[0])
 	assert.Nil(t, err)
 
 	message, err := reader.ReadMessage(context.Background())
@@ -103,7 +103,7 @@ func TestSaslPlaintextProducer(t *testing.T) {
 	kafkaConfig := configStruct.Kafka["test-sasl_plaintext"]
 
 	//写数据
-	writer, err := NewWriter(kafkaConfig, kafkaConfig.Producers[0])
+	writer, err := newWriter(kafkaConfig, kafkaConfig.Producers[0])
 	assert.Nil(t, err)
 
 	data := &testData{StuId: "1"}
@@ -119,7 +119,7 @@ func TestSaslPlaintextProducer(t *testing.T) {
 	time.Sleep(time.Second)
 
 	//读数据
-	reader, err := NewReader(kafkaConfig, kafkaConfig.Consumers[0])
+	reader, err := newReader(kafkaConfig, kafkaConfig.Consumers[0])
 	assert.Nil(t, err)
 
 	message, err := reader.ReadMessage(context.Background())
@@ -128,4 +128,20 @@ func TestSaslPlaintextProducer(t *testing.T) {
 	data = &testData{}
 	err = json.Unmarshal(message.Value, data)
 	assert.Nil(t, err)
+}
+
+func TestInit(t *testing.T) {
+	configStruct := &config.Configs{}
+	config.Init("./data/config.toml", configStruct)
+	logger.Init("TestInit", configStruct.LoggerConfig)
+
+	background := context.Background()
+	Init(background, configStruct.Kafka)
+
+	writer := GetWriter(background, "test-sasl_plaintext", "test")
+	assert.NotNil(t, writer)
+
+	reader := GetReader(background, "test-sasl_plaintext", "test")
+	assert.NotNil(t, reader)
+	time.Sleep(time.Hour)
 }
