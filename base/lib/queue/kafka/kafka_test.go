@@ -136,5 +136,8 @@ func TestInit(t *testing.T) {
 
 	reader := GetReader(background, "test-sasl_plaintext", "test")
 	assert.NotNil(t, reader)
+
+	reader = GetReader(background, "test-sasl_plaintext", "test")
+	assert.NotNil(t, reader)
 	time.Sleep(time.Second * 5)
 }

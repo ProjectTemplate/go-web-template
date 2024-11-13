@@ -14,7 +14,7 @@ import (
 // dbMap 存储初始化后的数据库实例
 var dbMap map[string]*gorm.DB
 
-// GetDB 根据别名获取数据库连接，别名必须存在，否则会panic
+// GetDB 根据别名获取数据库连接 [gorm.DB]，别名必须存在，否则会panic
 func GetDB(ctx context.Context, name string) *gorm.DB {
 	db := dbMap[name]
 	if db == nil {

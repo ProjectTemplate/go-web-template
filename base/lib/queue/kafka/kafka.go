@@ -6,6 +6,7 @@ import (
 	"github.com/segmentio/kafka-go"
 	"go-web-template/base/lib/logger"
 	"go.uber.org/zap"
+	"sync"
 	"time"
 
 	"github.com/segmentio/kafka-go/sasl/plain"
@@ -20,8 +21,11 @@ type kafkaWriterReader struct {
 	writers map[string]*kafka.Writer
 	// 创建 kafka.Reader 的时候会直接启动 Reader 和服务器建立连接，这里存储配置，调用GetReader方法的时候再创建
 	readerConfigs map[string]*kafka.ReaderConfig
+	// 用于存储已经创建的 Reader，避免重复创建
+	readers sync.Map
 }
 
+// GetWriter 根据集群名字和writer名字获取 [kafka.Writer]，如果不存在会panic
 func GetWriter(ctx context.Context, clusterName string, writerName string) *kafka.Writer {
 	if kafkaClusters == nil {
 		logger.Info(ctx, "GetWriter, kafkaClusters is nil")
@@ -34,6 +38,7 @@ func GetWriter(ctx context.Context, clusterName string, writerName string) *kafk
 		panic("GetWriter, cluster not found, cluster name:" + clusterName)
 	}
 
+	//获取writer
 	writer, ok := cluster.writers[writerName]
 	if !ok {
 		logger.Info(ctx, "GetWriter, writer not found", zap.String("clusterName", clusterName), zap.String("writerName", writerName))
@@ -43,6 +48,7 @@ func GetWriter(ctx context.Context, clusterName string, writerName string) *kafk
 	return writer
 }
 
+// GetReader 根据集群名字和reader名字获取 [kafka.Reader]，如果不存在会panic
 func GetReader(ctx context.Context, clusterName string, readerName string) *kafka.Reader {
 	if kafkaClusters == nil {
 		logger.Info(ctx, "GetReader, kafkaClusters is nil")
@@ -55,21 +61,59 @@ func GetReader(ctx context.Context, clusterName string, readerName string) *kafk
 		panic("GetReader, cluster not found, cluster name:" + clusterName)
 	}
 
+	// 从缓存中获取，如果已经初始化过则直接返回
+	value, ok := cluster.readers.Load(readerName)
+	if ok {
+		return value.(*kafka.Reader)
+	}
+
+	//获取配置
 	readerConfig, ok := cluster.readerConfigs[readerName]
 	if !ok {
 		logger.Info(ctx, "GetReader, reader not found", zap.String("clusterName", clusterName), zap.String("readerName", readerName))
 		panic("GetReader, reader not found, reader name:" + readerName)
 	}
 
-	return kafka.NewReader(*readerConfig)
+	//初始化
+	reader := kafka.NewReader(*readerConfig)
+
+	//缓存
+	cluster.readers.Store(readerName, reader)
+
+	return reader
 }
 
 // Init 初始化kafka
 // 支持三种连接方式，分别是 plaintext、sasl_ssl和sasl_plaintext
+//
 // plaintext 不需要用户密码
+//
 // sasl_plaintext 需要用户名和密码
+//
 // sasl_ssl 需要证书、用户名和密码
-// 详细配置信息课参考配置文件
+//
+// 详细配置信息可参考配置文件 [./data/config.toml]
+//
+// kafka是前缀，test-plaintext是集群别名，readers和writers是对应的读写配置
+// 可以根据集群别名和readers的name获取 [kafka.Reader]
+// 可以根据集群别名和writers的name获取 [kafka.Writer]
+// [kafka.test-plaintext]
+//
+//	brokers = "127.0.0.1:9092,127.0.0.1:9092"
+//	security_protocol = "plaintext"
+//
+// [[kafka.test-plaintext.readers]]
+//
+//	name = "test"
+//	topic = "demo_test"
+//	group = "demo_test"
+//	commit_interval = "2s"
+//
+// [[kafka.test-plaintext.writers]]
+//
+//	name = "test"
+//	topic = "demo_test"
+//	ack_config = "one"
 func Init(ctx context.Context, kafkaConfigs map[string]config.Kafka) {
 	if len(kafkaConfigs) == 0 {
 		logger.Info(ctx, "Init Kafka, configs is empty")
@@ -82,6 +126,7 @@ func Init(ctx context.Context, kafkaConfigs map[string]config.Kafka) {
 		writerReaders := &kafkaWriterReader{
 			writers:       make(map[string]*kafka.Writer),
 			readerConfigs: make(map[string]*kafka.ReaderConfig),
+			readers:       sync.Map{},
 		}
 
 		// 消费者初始化

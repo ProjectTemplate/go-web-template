@@ -14,9 +14,11 @@ func TestCount(t *testing.T) {
 	config.Init("./data/config.toml", configStruct)
 	logger.Init("TestGorm", configStruct.LoggerConfig)
 
-	Init(context.Background(), configStruct.Mysql)
+	background := context.Background()
 
-	db := GetDB("test")
+	Init(background, configStruct.Mysql)
+
+	db := GetDB(background, "test")
 	assert.NotNil(t, db)
 
 	count := new(int64)
@@ -30,8 +32,9 @@ func TestGormError(t *testing.T) {
 	config.Init("./data/config.toml", configStruct)
 	logger.Init("TestGormError", configStruct.LoggerConfig)
 
-	Init(context.Background(), configStruct.Mysql)
-	db := GetDB("test")
+	background := context.Background()
+	Init(background, configStruct.Mysql)
+	db := GetDB(background, "test")
 
 	assert.NotNil(t, db)
 

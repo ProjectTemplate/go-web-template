@@ -48,7 +48,7 @@ type client struct {
 	namingClients map[string]naming_client.INamingClient
 }
 
-// GetConfigClient 根据名字获取配置客户端，如果不存在则panic
+// GetConfigClient 根据名字获取配置客户端 [config_client.IConfigClient]，如果不存在则panic
 func GetConfigClient(ctx context.Context, name string) config_client.IConfigClient {
 	configClient := cli.configClients[name]
 	if configClient == nil {
@@ -58,7 +58,7 @@ func GetConfigClient(ctx context.Context, name string) config_client.IConfigClie
 	return configClient
 }
 
-// GetNamingClient 根据名字获取命名客户端，如果不存在则panic
+// GetNamingClient 根据名字获取命名客户端 [naming_client.INamingClient]，如果不存在则panic
 func GetNamingClient(ctx context.Context, name string) naming_client.INamingClient {
 	namingClient := cli.namingClients[name]
 	if namingClient == nil {
