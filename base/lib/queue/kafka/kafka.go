@@ -93,27 +93,6 @@ func GetReader(ctx context.Context, clusterName string, readerName string) *kafk
 // sasl_ssl 需要证书、用户名和密码
 //
 // 详细配置信息可参考配置文件 [./data/config.toml]
-//
-// kafka是前缀，test-plaintext是集群别名，readers和writers是对应的读写配置
-// 可以根据集群别名和readers的name获取 [kafka.Reader]
-// 可以根据集群别名和writers的name获取 [kafka.Writer]
-// [kafka.test-plaintext]
-//
-//	brokers = "127.0.0.1:9092,127.0.0.1:9092"
-//	security_protocol = "plaintext"
-//
-// [[kafka.test-plaintext.readers]]
-//
-//	name = "test"
-//	topic = "demo_test"
-//	group = "demo_test"
-//	commit_interval = "2s"
-//
-// [[kafka.test-plaintext.writers]]
-//
-//	name = "test"
-//	topic = "demo_test"
-//	ack_config = "one"
 func Init(ctx context.Context, kafkaConfigs map[string]config.Kafka) {
 	if len(kafkaConfigs) == 0 {
 		logger.Info(ctx, "Init Kafka, configs is empty")
