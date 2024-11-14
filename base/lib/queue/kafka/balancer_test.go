@@ -42,6 +42,10 @@ func BenchmarkKeyBalancer(b *testing.B) {
 	b.Run("leastBytes-random", func(b *testing.B) {
 		runBalancer(leastBytes, message)
 	})
+
+	b.Run("do-nothing", func(b *testing.B) {
+		// do nothing
+	})
 }
 
 func runBalancer(balancer kafka.Balancer, message kafka.Message) {
