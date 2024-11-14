@@ -173,7 +173,7 @@ func newPlaintextWriter(clusterConfig config.Kafka, ackConfig kafka.RequiredAcks
 		Addr:         kafka.TCP(clusterConfig.Brokers...),
 		Topic:        writerConfig.Topic,
 		RequiredAcks: ackConfig,
-		Balancer:     &kafka.Hash{},
+		Balancer:     &kafka.CRC32Balancer{},
 		Logger:       &kafkaInfoLogger{},
 		ErrorLogger:  &kafkaErrorLogger{},
 	}
