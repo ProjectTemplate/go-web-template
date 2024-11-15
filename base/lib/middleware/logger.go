@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"go-web-template/base/common/constant"
 	"go-web-template/base/common/utils"
 )
@@ -12,7 +11,7 @@ func InitContext(projectName string) gin.HandlerFunc {
 		// traceId
 		traceId := c.GetHeader(constant.HeaderKeyTraceId)
 		if traceId == "" {
-			traceId = uuid.New().String() + "." + projectName
+			traceId = utils.UUID() + "." + projectName
 		}
 
 		//span
