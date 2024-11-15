@@ -37,3 +37,25 @@ func GetDomain(ctx context.Context) string {
 	}
 	return ""
 }
+
+func WithURL(parent context.Context, url string) context.Context {
+	return context.WithValue(parent, constant.ContextKeyURL, url)
+}
+
+func GetURL(ctx context.Context) string {
+	if url, ok := ctx.Value(constant.ContextKeyURL).(string); ok {
+		return url
+	}
+	return ""
+}
+
+func WithRemoteIP(parent context.Context, remoteIP string) context.Context {
+	return context.WithValue(parent, constant.ContextKeyRemoteIp, remoteIP)
+}
+
+func GetRemoteIP(ctx context.Context) string {
+	if remoteIP, ok := ctx.Value(constant.ContextKeyRemoteIp).(string); ok {
+		return remoteIP
+	}
+	return ""
+}

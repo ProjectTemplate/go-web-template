@@ -201,8 +201,10 @@ func commonLoggerKeyValues(ctx context.Context) []interface{} {
 
 	return []interface{}{
 		constant.ContextKeyDomain, utils.GetDomain(ctx),
+		constant.ContextKeyURL, utils.GetURL(ctx),
 		constant.HeaderKeyTraceId, utils.GetTraceId(ctx),
 		constant.ContextKeySpan, spanStr,
+		constant.ContextKeyRemoteIp, utils.GetRemoteIP(ctx),
 	}
 }
 

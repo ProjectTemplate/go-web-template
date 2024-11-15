@@ -9,25 +9,23 @@ import (
 
 func InitContext(projectName string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		context := c.Request.Context()
-
-		//domain
-		domain := c.GetHeader(constant.HeaderKeyDomain)
-		context = utils.WithDomain(context, domain)
-
 		// traceId
 		traceId := c.GetHeader(constant.HeaderKeyTraceId)
 		if traceId == "" {
 			traceId = uuid.New().String() + "." + projectName
 		}
-		context = utils.WithTraceId(context, traceId)
 
 		//span
 		parentSpan := c.GetHeader(constant.HeaderKeySpan)
-		context = utils.WithSpan(context, parentSpan)
+
+		ctx := utils.WithTraceId(c.Request.Context(), traceId)
+		ctx = utils.WithDomain(ctx, c.Request.Host)
+		ctx = utils.WithURL(ctx, c.Request.URL.String())
+		ctx = utils.WithRemoteIP(ctx, c.RemoteIP())
+		ctx = utils.WithSpan(ctx, parentSpan)
 
 		//设置新的context
-		c.Request.WithContext(context)
+		c.Request = c.Request.WithContext(ctx)
 
 		c.Next()
 	}

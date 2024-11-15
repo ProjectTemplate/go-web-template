@@ -20,6 +20,18 @@ import (
 // confFile 配置文件路径
 var confFile string
 
+// initCommandLineFlag 初始化命令行参数
+func initCommandLineFlag() {
+	flag.StringVar(&confFile, "conf", "../../configs/config_dev.toml", "config path, eg: -conf config.yaml")
+	flag.Parse()
+
+	absConfPath, err := filepath.Abs(confFile)
+	utils.PanicAndPrintIfNotNil(err)
+
+	fmt.Println("confPath: ", confFile)
+	fmt.Println("confPath abs: ", absConfPath)
+}
+
 func main() {
 
 	background := context.Background()
@@ -46,7 +58,8 @@ func main() {
 	r.Use(panicRecover, initContext)
 
 	r.GET("/ping", func(c *gin.Context) {
-		logger.Info(c.Request.Context(), "ping")
+		ctx := c.Request.Context()
+		logger.Info(ctx, "ping")
 		response.Success(c, struct {
 			Message string `json:"message"`
 		}{Message: "pong"})
@@ -68,16 +81,4 @@ func main() {
 	utils.PanicAndPrintIfNotNil(err)
 
 	logger.Info(background, "server run success", zap.String("address", address))
-}
-
-// initCommandLineFlag 初始化命令行参数
-func initCommandLineFlag() {
-	flag.StringVar(&confFile, "conf", "../../configs/config_dev.toml", "config path, eg: -conf config.yaml")
-	flag.Parse()
-
-	absConfPath, err := filepath.Abs(confFile)
-	utils.PanicAndPrintIfNotNil(err)
-
-	fmt.Println("confPath: ", confFile)
-	fmt.Println("confPath abs: ", absConfPath)
 }
