@@ -193,17 +193,11 @@ func formatMessage(template string, args ...interface{}) string {
 }
 
 func commonLoggerKeyValues(ctx context.Context) []interface{} {
-	spanStr := ""
-	span := utils.GetSpan(ctx)
-	if span != nil {
-		spanStr = span.IncreaseAndGet()
-	}
-
 	return []interface{}{
 		constant.ContextKeyDomain, utils.GetDomain(ctx),
 		constant.ContextKeyURL, utils.GetURL(ctx),
 		constant.HeaderKeyTraceId, utils.GetTraceId(ctx),
-		constant.ContextKeySpan, spanStr,
+		constant.ContextKeySpan, utils.GetSpan(ctx),
 		constant.ContextKeyRemoteIp, utils.GetRemoteIP(ctx),
 	}
 }

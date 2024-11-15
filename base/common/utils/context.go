@@ -20,11 +20,11 @@ func WithSpan(parent context.Context, parentSpan string) context.Context {
 	return context.WithValue(parent, constant.ContextKeySpan, NewSpan(parentSpan))
 }
 
-func GetSpan(ctx context.Context) *Span {
+func GetSpan(ctx context.Context) string {
 	if span, ok := ctx.Value(constant.ContextKeySpan).(*Span); ok {
-		return span
+		return span.IncreaseAndGet()
 	}
-	return nil
+	return ""
 }
 
 func WithDomain(parent context.Context, domain string) context.Context {
