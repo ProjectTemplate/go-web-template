@@ -96,9 +96,12 @@ func Init(projectName string, loggerConfig config.LoggerConfig) {
 	consoleEncoder := zapcore.NewConsoleEncoder(NewEncoderConfig())
 
 	var cores = make([]zapcore.Core, 0, 2)
+	//file logger
 	newCore := zapcore.NewCore(logFileEncoder, output, levelEnable)
 	newCore = newCore.With([]zap.Field{zap.String("projectName", projectName)})
 	cores = append(cores, newCore)
+
+	//console logger
 	if loggerConfig.Console {
 		consoleCore := zapcore.NewCore(consoleEncoder, console, levelEnable)
 		consoleCore = consoleCore.With([]zap.Field{zap.String("projectName", projectName)})
@@ -107,10 +110,8 @@ func Init(projectName string, loggerConfig config.LoggerConfig) {
 
 	core := zapcore.NewTee(cores...)
 
-	l := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
-
-	logger = l
-	loggerSugared = l.Sugar()
+	logger = zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
+	loggerSugared = logger.Sugar()
 }
 
 func NewEncoderConfig() zapcore.EncoderConfig {
@@ -142,26 +143,22 @@ func checkNil() {
 
 func Debug(ctx context.Context, msg string, fields ...zap.Field) {
 	checkNil()
-	mergerFields := append(commonLoggerFields(ctx), fields...)
-	logger.Debug(msg, mergerFields...)
+	logger.Debug(msg, commonLoggerFields(ctx, fields)...)
 }
 
 func Info(ctx context.Context, msg string, fields ...zap.Field) {
 	checkNil()
-	mergerFields := append(commonLoggerFields(ctx), fields...)
-	logger.Info(msg, mergerFields...)
+	logger.Info(msg, commonLoggerFields(ctx, fields)...)
 }
 
 func Warn(ctx context.Context, msg string, fields ...zap.Field) {
 	checkNil()
-	mergerFields := append(commonLoggerFields(ctx), fields...)
-	logger.Warn(msg, mergerFields...)
+	logger.Warn(msg, commonLoggerFields(ctx, fields)...)
 }
 
 func Error(ctx context.Context, msg string, fields ...zap.Field) {
 	checkNil()
-	mergerFields := append(commonLoggerFields(ctx), fields...)
-	logger.Error(msg, mergerFields...)
+	logger.Error(msg, commonLoggerFields(ctx, fields)...)
 }
 
 func SDebugF(ctx context.Context, msg string, args ...interface{}) {
@@ -209,13 +206,14 @@ func commonLoggerKeyValues(ctx context.Context) []interface{} {
 	}
 }
 
-func commonLoggerFields(ctx context.Context) []zap.Field {
+func commonLoggerFields(ctx context.Context, fields []zap.Field) []zap.Field {
 	loggerKeyValues := commonLoggerKeyValues(ctx)
 
-	result := make([]zap.Field, 0, len(loggerKeyValues)/2)
+	result := make([]zap.Field, len(loggerKeyValues)/2+len(fields))
 	for i := 0; i < len(loggerKeyValues); i += 2 {
-		result = append(result, zap.String(loggerKeyValues[i].(string), loggerKeyValues[i+1].(string)))
+		result[i/2] = zap.String(loggerKeyValues[i].(string), loggerKeyValues[i+1].(string))
 	}
 
+	copy(result[cap(result)-len(fields):], fields)
 	return result
 }
