@@ -3,6 +3,8 @@ package logger
 import (
 	"context"
 	"fmt"
+	"go-web-template/base/common/constant"
+	"go-web-template/base/common/utils"
 	"go-web-template/base/lib/config"
 	"os"
 	"path"
@@ -105,7 +107,7 @@ func Init(projectName string, loggerConfig config.LoggerConfig) {
 
 	core := zapcore.NewTee(cores...)
 
-	l := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.WarnLevel))
+	l := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
 
 	logger = l
 	loggerSugared = l.Sugar()
@@ -140,41 +142,80 @@ func checkNil() {
 
 func Debug(ctx context.Context, msg string, fields ...zap.Field) {
 	checkNil()
-	logger.Debug(msg, fields...)
+	mergerFields := append(commonLoggerFields(ctx), fields...)
+	logger.Debug(msg, mergerFields...)
 }
 
 func Info(ctx context.Context, msg string, fields ...zap.Field) {
 	checkNil()
-	logger.Info(msg, fields...)
+	mergerFields := append(commonLoggerFields(ctx), fields...)
+	logger.Info(msg, mergerFields...)
 }
 
 func Warn(ctx context.Context, msg string, fields ...zap.Field) {
 	checkNil()
-	logger.Warn(msg, fields...)
+	mergerFields := append(commonLoggerFields(ctx), fields...)
+	logger.Warn(msg, mergerFields...)
 }
 
 func Error(ctx context.Context, msg string, fields ...zap.Field) {
 	checkNil()
-	logger.Error(msg, fields...)
+	mergerFields := append(commonLoggerFields(ctx), fields...)
+	logger.Error(msg, mergerFields...)
 }
 
 func SDebugF(ctx context.Context, msg string, args ...interface{}) {
 	checkNil()
-	loggerSugared.Debugf(msg, args...)
+	message := formatMessage(msg, args...)
+	loggerSugared.Debugw(message, commonLoggerKeyValues(ctx)...)
 }
 
 func SInfoF(ctx context.Context, msg string, args ...interface{}) {
 	checkNil()
-	loggerSugared.Infof(msg, args...)
+	message := formatMessage(msg, args...)
+	loggerSugared.Infow(message, commonLoggerKeyValues(ctx)...)
 }
 
 func SWarnF(ctx context.Context, msg string, args ...interface{}) {
 	checkNil()
-	loggerSugared.With("tag", "")
-	loggerSugared.Warnf(msg, args...)
+	message := formatMessage(msg, args...)
+	loggerSugared.Warnw(message, commonLoggerKeyValues(ctx)...)
 }
 
 func SErrorF(ctx context.Context, msg string, args ...interface{}) {
 	checkNil()
-	loggerSugared.Errorf(msg, args...)
+	message := formatMessage(msg, args...)
+	loggerSugared.Errorw(message, commonLoggerKeyValues(ctx)...)
+}
+
+func formatMessage(template string, args ...interface{}) string {
+	if len(args) > 0 {
+		return fmt.Sprintf(template, args...)
+	}
+	return template
+}
+
+func commonLoggerKeyValues(ctx context.Context) []interface{} {
+	spanStr := ""
+	span := utils.GetSpan(ctx)
+	if span != nil {
+		spanStr = span.IncreaseAndGet()
+	}
+
+	return []interface{}{
+		constant.ContextKeyDomain, utils.GetDomain(ctx),
+		constant.HeaderKeyTraceId, utils.GetTraceId(ctx),
+		constant.ContextKeySpan, spanStr,
+	}
+}
+
+func commonLoggerFields(ctx context.Context) []zap.Field {
+	loggerKeyValues := commonLoggerKeyValues(ctx)
+
+	result := make([]zap.Field, 0, len(loggerKeyValues)/2)
+	for i := 0; i < len(loggerKeyValues); i += 2 {
+		result = append(result, zap.String(loggerKeyValues[i].(string), loggerKeyValues[i+1].(string)))
+	}
+
+	return result
 }

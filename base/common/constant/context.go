@@ -1,7 +1,11 @@
 package constant
 
 const (
-	ContextKeyTraceId = "traceId"
-	ContextKeyRpcID   = "rpcId"
 	ContextKeyDomain  = "domain"
+	ContextKeyTraceId = "traceId"
+	ContextKeySpan    = "span"
+
+	HeaderKeyDomain  = ContextKeyDomain
+	HeaderKeyTraceId = ContextKeyTraceId
+	HeaderKeySpan    = ContextKeySpan
 )

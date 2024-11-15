@@ -16,15 +16,15 @@ func GetTraceId(ctx context.Context) string {
 	return ""
 }
 
-func RpcID(parent context.Context, rpcId string) context.Context {
-	return context.WithValue(parent, constant.ContextKeyRpcID, rpcId)
+func WithSpan(parent context.Context, parentSpan string) context.Context {
+	return context.WithValue(parent, constant.ContextKeySpan, NewSpan(parentSpan))
 }
 
-func GetRpcID(ctx context.Context) string {
-	if rpcId, ok := ctx.Value(constant.ContextKeyRpcID).(string); ok {
-		return rpcId
+func GetSpan(ctx context.Context) *Span {
+	if span, ok := ctx.Value(constant.ContextKeySpan).(*Span); ok {
+		return span
 	}
-	return ""
+	return nil
 }
 
 func WithDomain(parent context.Context, domain string) context.Context {

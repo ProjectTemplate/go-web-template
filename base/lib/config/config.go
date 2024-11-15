@@ -15,12 +15,17 @@ const (
 
 // Configs 配置信息
 type Configs struct {
+	App          App              `mapstructure:"app"`
 	Server       Server           `mapstructure:"server"`
 	LoggerConfig LoggerConfig     `mapstructure:"log"`
 	Mysql        map[string]DB    `mapstructure:"mysql"`
 	Nacos        map[string]Nacos `mapstructure:"nacos"`
 	Redis        map[string]Redis `mapstructure:"redis"`
 	Kafka        map[string]Kafka `mapstructure:"kafka"`
+}
+
+type App struct {
+	Name string `mapstructure:"name"`
 }
 
 // Server 服务器配置

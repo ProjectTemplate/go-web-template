@@ -4,8 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"go-web-template/base/lib/gin/response"
-	"go-web-template/base/lib/middleware"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
@@ -14,7 +12,9 @@ import (
 	"go-web-template/app/admin/internal/global"
 	"go-web-template/base/common/utils"
 	"go-web-template/base/lib/config"
+	"go-web-template/base/lib/gin/response"
 	"go-web-template/base/lib/logger"
+	"go-web-template/base/lib/middleware"
 )
 
 // confFile 配置文件路径
@@ -41,7 +41,9 @@ func main() {
 	r := gin.New()
 	// 中间件处理
 
-	r.Use(middleware.PanicRecover(response.NewReason(response.AdminInternalErrorCode)))
+	panicRecover := middleware.PanicRecover(response.NewReason(response.AdminInternalErrorCode))
+	initContext := middleware.InitContext(global.Configs.App.Name)
+	r.Use(panicRecover, initContext)
 
 	r.GET("/ping", func(c *gin.Context) {
 		logger.Info(c.Request.Context(), "ping")

@@ -11,8 +11,11 @@ func TestParseConfig(t *testing.T) {
 	Init("./data/config.toml", conf)
 
 	assert.NotNil(t, conf)
+	assert.NotNil(t, conf.App)
 	assert.NotNil(t, conf.Server)
 	assert.NotNil(t, conf.LoggerConfig)
+
+	assert.Equal(t, "test", conf.App.Name)
 
 	assert.Equal(t, "127.0.0.1:8080", conf.Server.Address)
 	assert.Equal(t, true, conf.Server.Debug)

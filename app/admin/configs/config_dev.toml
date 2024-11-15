@@ -1,4 +1,8 @@
+[app]
+    name = "go-web-template"
+
 [server]
+    name = "go-web-template"
     address = "127.0.0.1:8080"
     debug = true
 
