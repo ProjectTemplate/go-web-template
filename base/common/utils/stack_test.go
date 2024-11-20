@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -14,7 +13,7 @@ func test(t *testing.T) {
 	stack := CallerStack(0, 0)
 
 	assert.NotNil(t, stack)
-	fmt.Println(stack.String())
+	//fmt.Println(stack.String())
 }
 
 func TestGetParentCallerMethodName(t *testing.T) {
