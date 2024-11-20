@@ -18,6 +18,7 @@ func initLogger(name string) {
 
 func TestFBackground(t *testing.T) {
 	initLogger("TestF")
+	defer Flush()
 
 	ctx := context.Background()
 
@@ -36,6 +37,7 @@ func TestFBackground(t *testing.T) {
 
 func TestF(t *testing.T) {
 	initLogger("TestF")
+	defer Flush()
 
 	ctx := initContext()
 
@@ -54,6 +56,7 @@ func TestF(t *testing.T) {
 
 func TestWBackground(t *testing.T) {
 	initLogger("TestF")
+	defer Flush()
 
 	ctx := initContext()
 
@@ -72,6 +75,7 @@ func TestWBackground(t *testing.T) {
 
 func TestW(t *testing.T) {
 	initLogger("TestF")
+	defer Flush()
 
 	ctx := initContext()
 
@@ -90,6 +94,7 @@ func TestW(t *testing.T) {
 
 func initContext() context.Context {
 	ctx := context.Background()
+	defer Flush()
 
 	ctx = utils.WithDomain(ctx, "www.baidu.com")
 	ctx = utils.WithTraceId(ctx, "trace-1231231232")
@@ -99,6 +104,7 @@ func initContext() context.Context {
 
 func TestMultiSingle(t *testing.T) {
 	initLogger("TestMultiSingle")
+	defer Flush()
 
 	times := 1024
 	for i := 0; i < times; i++ {
@@ -108,6 +114,8 @@ func TestMultiSingle(t *testing.T) {
 
 func TestMultiOpen(t *testing.T) {
 	initLogger("TestMultiOpen")
+	defer Flush()
+
 	ctx := initContext()
 
 	waitGroup := sync.WaitGroup{}

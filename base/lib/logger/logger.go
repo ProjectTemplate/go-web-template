@@ -22,6 +22,10 @@ var (
 )
 
 const (
+	loggerFieldTimestamp = "timestamp"
+)
+
+const (
 	// defaultPath 日志路径
 	defaultPath = "./"
 	// defaultFileName 日志文件名
@@ -194,6 +198,7 @@ func formatMessage(template string, args ...interface{}) string {
 
 func commonLoggerKeyValues(ctx context.Context) []interface{} {
 	return []interface{}{
+		loggerFieldTimestamp, time.Now().UnixNano(),
 		constant.ContextKeyDomain, utils.GetDomain(ctx),
 		constant.ContextKeyURL, utils.GetURL(ctx),
 		constant.HeaderKeyTraceId, utils.GetTraceId(ctx),
@@ -207,9 +212,18 @@ func commonLoggerFields(ctx context.Context, fields []zap.Field) []zap.Field {
 
 	result := make([]zap.Field, len(loggerKeyValues)/2+len(fields))
 	for i := 0; i < len(loggerKeyValues); i += 2 {
-		result[i/2] = zap.String(loggerKeyValues[i].(string), loggerKeyValues[i+1].(string))
+		if _, ok := loggerKeyValues[i+1].(string); ok {
+			result[i/2] = zap.String(loggerKeyValues[i].(string), loggerKeyValues[i+1].(string))
+		} else {
+			result[i/2] = zap.Any(loggerKeyValues[i].(string), loggerKeyValues[i+1])
+		}
 	}
 
 	copy(result[cap(result)-len(fields):], fields)
 	return result
+}
+
+func Flush() error {
+	checkNil()
+	return logger.Sync()
 }
