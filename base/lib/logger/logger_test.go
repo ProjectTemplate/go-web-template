@@ -7,6 +7,7 @@ import (
 	"go.uber.org/zap"
 	"sync"
 	"testing"
+	"time"
 )
 
 func initLogger(name string) {
@@ -61,16 +62,16 @@ func TestWBackground(t *testing.T) {
 	ctx := initContext()
 
 	Debug(ctx, "Debug")
-	Debug(ctx, "Debug", zap.String("number", "1"))
+	Debug(ctx, "Debug", WithHttpField(ctx, zap.String("number", "1"))...)
 
 	Info(ctx, "Info")
-	Info(ctx, "Info", zap.String("number", "1"))
+	Info(ctx, "Info", WithHttpField(ctx, zap.String("number", "1"))...)
 
 	Warn(ctx, "Warn")
-	Warn(ctx, "Warn", zap.String("number", "1"))
+	Warn(ctx, "Warn", WithHttpField(ctx, zap.String("number", "1"))...)
 
 	Error(ctx, "Error")
-	Error(ctx, "Error", zap.String("number", "1"))
+	Error(ctx, "Error", WithHttpField(ctx, zap.String("number", "1"))...)
 }
 
 func TestW(t *testing.T) {
@@ -99,6 +100,8 @@ func initContext() context.Context {
 	ctx = utils.WithDomain(ctx, "www.baidu.com")
 	ctx = utils.WithTraceId(ctx, "trace-1231231232")
 	ctx = utils.WithSpan(ctx, "1")
+	ctx = utils.WithURL(ctx, "hello?name=world")
+	ctx = utils.WithStartTime(ctx, time.Now())
 	return ctx
 }
 

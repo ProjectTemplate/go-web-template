@@ -8,7 +8,7 @@ import (
 )
 
 func TestSpan(t *testing.T) {
-	span := NewSpan("")
+	span := NewSpan("", "")
 
 	spanStr := span.IncreaseAndGet()
 	assert.Equal(t, "1", spanStr)
@@ -18,7 +18,7 @@ func TestSpan(t *testing.T) {
 }
 
 func TestWithParent(t *testing.T) {
-	span := NewSpan("1")
+	span := NewSpan("1", "")
 
 	spanStr := span.IncreaseAndGet()
 	assert.Equal(t, "1.1", spanStr)
@@ -34,7 +34,7 @@ func TestParallel(t *testing.T) {
 	waitGroup := &sync.WaitGroup{}
 	waitGroup.Add(goRoutineCount)
 
-	span := NewSpan("1")
+	span := NewSpan("1", "")
 	for i := 0; i < goRoutineCount; i++ {
 		go invokeIncreaseAndGet(span, count, waitGroup)
 	}

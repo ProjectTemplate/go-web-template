@@ -22,10 +22,6 @@ var (
 )
 
 const (
-	loggerFieldTimestamp = "timestamp"
-)
-
-const (
 	// defaultPath 日志路径
 	defaultPath = "./"
 	// defaultFileName 日志文件名
@@ -197,13 +193,12 @@ func formatMessage(template string, args ...interface{}) string {
 }
 
 func commonLoggerKeyValues(ctx context.Context) []interface{} {
+	startTime := utils.GetStartTime(ctx)
 	return []interface{}{
-		loggerFieldTimestamp, time.Now().UnixNano(),
-		constant.ContextKeyDomain, utils.GetDomain(ctx),
-		constant.ContextKeyURL, utils.GetURL(ctx),
+		constant.LoggerKeyTimestamp, time.Now().UnixMilli(),
+		constant.LoggerKeyDuration, time.Since(startTime).Milliseconds(),
 		constant.HeaderKeyTraceId, utils.GetTraceId(ctx),
 		constant.ContextKeySpan, utils.GetSpan(ctx),
-		constant.ContextKeyRemoteIp, utils.GetRemoteIP(ctx),
 	}
 }
 

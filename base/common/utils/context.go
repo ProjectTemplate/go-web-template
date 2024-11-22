@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"go-web-template/base/common/constant"
+	"time"
 )
 
 func WithTraceId(parent context.Context, traceId string) context.Context {
@@ -17,7 +18,7 @@ func GetTraceId(ctx context.Context) string {
 }
 
 func WithSpan(parent context.Context, parentSpan string) context.Context {
-	return context.WithValue(parent, constant.ContextKeySpan, NewSpan(parentSpan))
+	return context.WithValue(parent, constant.ContextKeySpan, NewSpan(parentSpan, ""))
 }
 
 func GetSpan(ctx context.Context) string {
@@ -58,4 +59,15 @@ func GetRemoteIP(ctx context.Context) string {
 		return remoteIP
 	}
 	return ""
+}
+
+func WithStartTime(parent context.Context, time time.Time) context.Context {
+	return context.WithValue(parent, constant.ContextKeyStartTime, time)
+}
+
+func GetStartTime(ctx context.Context) time.Time {
+	if startTime, ok := ctx.Value(constant.ContextKeyStartTime).(time.Time); ok {
+		return startTime
+	}
+	return time.Time{}
 }

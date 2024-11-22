@@ -22,14 +22,15 @@ func NewSpan(parentSpan, name string) *Span {
 	return &span
 }
 
-func (s *Span) Get() string {
-	spanNumber := s.number.Load()
+func (s *Span) child(childName string) Span {
+	spanNumber := s.number.Add(1)
 	spanStr := strconv.FormatInt(spanNumber, 10)
-	if s.parentSpan == "" {
-		return spanStr
-	}
 
-	return strings.Join([]string{s.parentSpan, spanStr}, ".")
+	return Span{
+		parentSpan: strings.Join([]string{s.parentSpan, spanStr}, "."),
+		name:       childName,
+		number:     atomic.Int64{},
+	}
 }
 
 // IncreaseAndGet 自增并获取 Span，每次获取的 Span 都是唯一的
