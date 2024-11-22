@@ -164,7 +164,7 @@ func Decode(code string) Code {
 func check(c Code) error {
 
 	if len(c.ProjectModule) > codeLengthProjectModule {
-		return errors.New("project module length is illegal")
+		return errors.New("project model length is illegal")
 	}
 
 	if len(c.Project) > codeLengthProject {

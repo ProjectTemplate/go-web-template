@@ -7,7 +7,7 @@
     debug = true
 
 [log]
-    console = true
+    console = false
     level = "DEBUG"
     path = "./"
     file_name = "server.log"

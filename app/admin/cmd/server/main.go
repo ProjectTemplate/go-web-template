@@ -4,6 +4,8 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"go-web-template/app/admin/internal/server"
+	"go-web-template/base/lib/signal"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
@@ -57,28 +59,27 @@ func main() {
 	initContext := middleware.InitContext(global.Configs.App.Name)
 	r.Use(panicRecover, initContext)
 
-	r.GET("/ping", func(c *gin.Context) {
-		ctx := c.Request.Context()
-		logger.Info(ctx, "ping")
-		response.Success(c, struct {
-			Message string `json:"message"`
-		}{Message: "pong"})
+	//注册路由
+	server.RegisterRouter(r)
+
+	//启动服务
+	go func() {
+		address := ":8080"
+		if global.Configs != nil && global.Configs.Server.Address != "" {
+			address = global.Configs.Server.Address
+		}
+		err := r.Run(address)
+		if err != nil {
+			logger.Error(background, "server run error", zap.Error(err))
+		}
+		utils.PanicAndPrintIfNotNil(err)
+	}()
+
+	//监听停止信号
+	signal.HandleSignal(background, func() {
+		err := logger.Flush()
+		if err != nil {
+			logger.Error(background, "logger flush error", zap.Error(err))
+		}
 	})
-
-	r.GET("/panic", func(c *gin.Context) {
-		panic("server panic")
-	})
-
-	address := ":8080"
-	if global.Configs != nil && global.Configs.Server.Address != "" {
-		address = global.Configs.Server.Address
-	}
-
-	err := r.Run(address)
-	if err != nil {
-		logger.Error(background, "server run error", zap.Error(err))
-	}
-	utils.PanicAndPrintIfNotNil(err)
-
-	logger.Info(background, "server run success", zap.String("address", address))
 }
