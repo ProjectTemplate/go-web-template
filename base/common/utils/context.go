@@ -23,7 +23,7 @@ func WithSpan(parent context.Context, parentSpan string) context.Context {
 
 func GetSpan(ctx context.Context) string {
 	if span, ok := ctx.Value(constant.ContextKeySpan).(*Span); ok {
-		return span.IncreaseAndGet()
+		return span.Span()
 	}
 	return ""
 }

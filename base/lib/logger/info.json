@@ -1,0 +1,17 @@
+[
+  {
+    "type": "span",
+    "parentSpan": "",
+    "span": "",
+    "spanStartTime": "",
+    "spanStartEnd": "",
+    "spanDuration": 100,
+    "tag": "请求的简要信息",
+    "otherInfo": ""
+  },
+  {
+    "type": "log",
+    "tag": "GetUserInfo",
+    "otherInfo": ""
+  }
+]

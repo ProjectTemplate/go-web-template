@@ -42,7 +42,8 @@ func main() {
 
 	config.Init(confFile, global.Configs)
 
-	logger.Init("go-web", global.Configs.LoggerConfig)
+	logger.Init(global.Configs.App.Name, global.Configs.LoggerConfig)
+	loggerFlushError := logger.Flush()
 
 	logger.Info(background, "start server.", zap.String("confFile", confFile), zap.Any("configs", global.Configs))
 
@@ -54,7 +55,6 @@ func main() {
 
 	r := gin.New()
 	// 中间件处理
-
 	panicRecover := middleware.PanicRecover(response.NewReason(response.AdminInternalErrorCode))
 	initContext := middleware.InitContext(global.Configs.App.Name)
 	r.Use(panicRecover, initContext)
@@ -78,7 +78,7 @@ func main() {
 	//监听停止信号
 	signal.HandleSignal(background, func() {
 		err := logger.Flush()
-		if err != nil {
+		if err.Error() != loggerFlushError.Error() {
 			logger.Error(background, "logger flush error", zap.Error(err))
 		}
 	})
