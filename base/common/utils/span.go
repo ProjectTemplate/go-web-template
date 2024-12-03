@@ -33,15 +33,22 @@ func NewSpan(parentSpan, name string) *Span {
 
 func (s *Span) Child(childName string) *Span {
 	spanNumber := s.number.Load()
-	formatInt := strconv.FormatInt(spanNumber, 10)
 
-	return &Span{
-		parentSpan: strings.Join([]string{s.parentSpan, formatInt}, "."),
+	parentSpan := strconv.FormatInt(spanNumber, 10)
+	if s.parentSpan != "" {
+		parentSpan = strings.Join([]string{s.parentSpan, parentSpan}, ".")
+	}
+
+	span := &Span{
+		parentSpan: parentSpan,
 		name:       childName,
 		number:     atomic.Int64{},
 		startTime:  time.Now(),
 		entTime:    time.Now(),
 	}
+
+	span.number.Store(1)
+	return span
 }
 
 // Next 获取下一个Span
