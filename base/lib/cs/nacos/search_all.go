@@ -6,6 +6,7 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/model"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 	"go-web-template/base/lib/logger"
+	"go.uber.org/zap"
 )
 
 // SearchConfigInGroup 搜索足内的所有配置
@@ -26,11 +27,16 @@ func SearchConfigInGroup(ctx context.Context, group string, configClient config_
 		searchResult, err := configClient.SearchConfig(searchConfigParam)
 
 		if err != nil {
-			logger.SErrorF(ctx, "Nacos SearchConfig, search config failed. searchConfigParam: %+v, err: %v", searchConfigParam, err)
+			logger.Error(ctx, "Nacos SearchConfig, search config failed.", zap.Any("searchConfigParam", searchConfigParam), zap.Error(err))
 			return nil, err
 		}
 
-		logger.SInfoF(ctx, "Nacos SearchConfig, search config success. searchConfigParam: %+v, total count: %d, page number: %d, pages available: %d, data count:%d", searchConfigParam, searchResult.TotalCount, searchResult.PageNumber, searchResult.PagesAvailable, len(searchResult.PageItems))
+		logger.Info(ctx, "Nacos SearchConfig, search config success.",
+			zap.Any("searchConfigParam", searchConfigParam),
+			zap.Int("total count", searchResult.TotalCount),
+			zap.Int("page number", searchResult.PageNumber),
+			zap.Int("pages available", searchResult.PagesAvailable),
+			zap.Int("data count", len(searchResult.PageItems)))
 
 		result = append(result, searchResult.PageItems...)
 		pageNo = pageNo + 1
@@ -40,6 +46,6 @@ func SearchConfigInGroup(ctx context.Context, group string, configClient config_
 		}
 	}
 
-	logger.SInfoF(ctx, "Nacos SearchConfig, search config success. group: %s, config count:%d", group, len(result))
+	logger.Info(ctx, "Nacos SearchConfig", zap.String("group", group), zap.Int("configCount", len(result)))
 	return result, nil
 }

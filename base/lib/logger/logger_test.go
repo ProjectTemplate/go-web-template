@@ -17,44 +17,6 @@ func initLogger(name string) {
 	Init(name, configs.LoggerConfig)
 }
 
-func TestFBackground(t *testing.T) {
-	initLogger("TestF")
-	defer Flush()
-
-	ctx := context.Background()
-
-	SDebugF(ctx, "Debug")
-	SDebugF(ctx, "Debug, number:%d", 1)
-
-	SInfoF(ctx, "Info")
-	SInfoF(ctx, "Info, number:%d", 1)
-
-	SWarnF(ctx, "Warn")
-	SWarnF(ctx, "Warn, number:%d", 1)
-
-	SErrorF(ctx, "Error")
-	SErrorF(ctx, "Error, number:%d", 1)
-}
-
-func TestF(t *testing.T) {
-	initLogger("TestF")
-	defer Flush()
-
-	ctx := initContext()
-
-	SDebugF(ctx, "Debug")
-	SDebugF(ctx, "Debug, number:%d", 1)
-
-	SInfoF(ctx, "Info")
-	SInfoF(ctx, "Info, number:%d", 1)
-
-	SWarnF(ctx, "Warn")
-	SWarnF(ctx, "Warn, number:%d", 1)
-
-	SErrorF(ctx, "Error")
-	SErrorF(ctx, "Error, number:%d", 1)
-}
-
 func TestWBackground(t *testing.T) {
 	initLogger("TestF")
 	defer Flush()
@@ -111,7 +73,7 @@ func TestMultiSingle(t *testing.T) {
 
 	times := 1024
 	for i := 0; i < times; i++ {
-		SInfoF(context.Background(), "测试打印日志,%s,%s", "name", "name")
+		Info(context.Background(), "测试打印日志", zap.String("name", "name"))
 	}
 }
 
@@ -126,7 +88,7 @@ func TestMultiOpen(t *testing.T) {
 	go func() {
 		times := 102400
 		for i := 0; i < times; i++ {
-			SInfoF(ctx, "1111111111,%s,%s", "name", "name")
+			Info(ctx, "1111111111", zap.String("name", "name"))
 		}
 		waitGroup.Done()
 	}()
@@ -134,7 +96,7 @@ func TestMultiOpen(t *testing.T) {
 	go func() {
 		times := 102400
 		for i := 0; i < times; i++ {
-			SInfoF(ctx, "2222222222,%s,%s", "name", "name")
+			Info(ctx, "2222222222", zap.String("name", "name"))
 		}
 		waitGroup.Done()
 	}()

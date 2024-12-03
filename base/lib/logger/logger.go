@@ -17,8 +17,7 @@ import (
 )
 
 var (
-	logger        *zap.Logger
-	loggerSugared *zap.SugaredLogger
+	logger *zap.Logger
 )
 
 const (
@@ -111,7 +110,6 @@ func Init(projectName string, loggerConfig config.LoggerConfig) {
 	core := zapcore.NewTee(cores...)
 
 	logger = zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
-	loggerSugared = logger.Sugar()
 }
 
 func NewEncoderConfig() zapcore.EncoderConfig {
@@ -159,37 +157,6 @@ func Warn(ctx context.Context, msg string, fields ...zap.Field) {
 func Error(ctx context.Context, msg string, fields ...zap.Field) {
 	checkNil()
 	logger.Error(msg, commonLoggerFields(ctx, fields)...)
-}
-
-func SDebugF(ctx context.Context, msg string, args ...interface{}) {
-	checkNil()
-	message := formatMessage(msg, args...)
-	loggerSugared.Debugw(message, commonLoggerKeyValues(ctx)...)
-}
-
-func SInfoF(ctx context.Context, msg string, args ...interface{}) {
-	checkNil()
-	message := formatMessage(msg, args...)
-	loggerSugared.Infow(message, commonLoggerKeyValues(ctx)...)
-}
-
-func SWarnF(ctx context.Context, msg string, args ...interface{}) {
-	checkNil()
-	message := formatMessage(msg, args...)
-	loggerSugared.Warnw(message, commonLoggerKeyValues(ctx)...)
-}
-
-func SErrorF(ctx context.Context, msg string, args ...interface{}) {
-	checkNil()
-	message := formatMessage(msg, args...)
-	loggerSugared.Errorw(message, commonLoggerKeyValues(ctx)...)
-}
-
-func formatMessage(template string, args ...interface{}) string {
-	if len(args) > 0 {
-		return fmt.Sprintf(template, args...)
-	}
-	return template
 }
 
 func commonLoggerKeyValues(ctx context.Context) []interface{} {

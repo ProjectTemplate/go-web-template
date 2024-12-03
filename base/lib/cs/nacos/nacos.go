@@ -70,7 +70,7 @@ func GetNamingClient(ctx context.Context, name string) naming_client.INamingClie
 
 // Init 初始化nacos客户端
 func Init(ctx context.Context, nacosConfigs map[string]config.Nacos) {
-	logger.SInfoF(ctx, "Init Nacos start, nacos configs: %+v", nacosConfigs)
+	logger.Info(ctx, "Init Nacos start.", zap.Any("nacosConfigs", nacosConfigs))
 
 	cli = &client{
 		configClients: make(map[string]config_client.IConfigClient),
@@ -80,14 +80,14 @@ func Init(ctx context.Context, nacosConfigs map[string]config.Nacos) {
 	for name, nacosConfig := range nacosConfigs {
 		clientType := nacosConfig.ClientType
 		if clientType != string(ClientTypeAll) && clientType != string(ClientTypeConfig) && clientType != string(ClientTypeNaming) {
-			logger.SErrorF(ctx, "Init Nacos, client type error, client type must be [config naming all]. name: %s, config:%+v", name, nacosConfig)
+			logger.Error(ctx, "Init Nacos, client type error, client type must be [config naming all].", zap.String("name", name), zap.Any("config", nacosConfig))
 			panic("Init Nacos failed, client type error, client type must be [config naming all], type: " + clientType)
 		}
 
 		if clientType == string(ClientTypeAll) || clientType == string(ClientTypeConfig) {
 			configClient, err := newConfigClient(ctx, nacosConfig)
 			if err != nil {
-				logger.SErrorF(ctx, "Nacos Init, new config client failed. name: %s, config:%+v err: %v", name, nacosConfig, err)
+				logger.Error(ctx, "Nacos Init, new config client failed.", zap.String("name", name), zap.Any("config", nacosConfig), zap.Error(err))
 				panic("Init Nacos failed, err:" + err.Error())
 			}
 			cli.configClients[name] = configClient
@@ -96,13 +96,13 @@ func Init(ctx context.Context, nacosConfigs map[string]config.Nacos) {
 		if clientType == string(ClientTypeAll) || clientType == string(ClientTypeNaming) {
 			namingClient, err := newNamingClient(ctx, nacosConfig)
 			if err != nil {
-				logger.SErrorF(ctx, "Init Nacos, new config client failed. name: %s, config:%+v err: %v", name, nacosConfig, err)
+				logger.Error(ctx, "Init Nacos, new config client failed.", zap.String("name", name), zap.Any("config", nacosConfig), zap.Error(err))
 				panic("Init Nacos failed, err:" + err.Error())
 			}
 			cli.namingClients[name] = namingClient
 		}
 
-		logger.SInfoF(ctx, "Init Nacos success, name: %s, config:%+v", name, nacosConfig)
+		logger.Info(ctx, "Init Nacos success.", zap.String("name", name), zap.Any("config", nacosConfig))
 	}
 }
 
@@ -115,7 +115,7 @@ func newConfigClient(ctx context.Context, nacosConfig config.Nacos) (config_clie
 		},
 	)
 	if err != nil {
-		logger.SErrorF(ctx, "Nacos NewConfigClient, new config client failed. nameSpaceId: %s, servers: %+v, err: %v", nacosConfig.Namespace, nacosConfig.Servers, err)
+		logger.Error(ctx, "Nacos NewConfigClient, new config client failed.", zap.String("nameSpaceId", nacosConfig.Namespace), zap.Any("servers", nacosConfig.Servers), zap.Error(err))
 		return configClient, err
 	}
 
@@ -131,7 +131,7 @@ func newNamingClient(ctx context.Context, nacosConfig config.Nacos) (naming_clie
 	)
 
 	if err != nil {
-		logger.SErrorF(ctx, "Nacos NewNamingClient, new naming client failed. nameSpaceId: %s, servers: %+v, err: %v", nacosConfig.Namespace, nacosConfig.Servers, err)
+		logger.Error(ctx, "Nacos NewNamingClient, new naming client failed.", zap.String("nameSpaceId", nacosConfig.Namespace), zap.Any("servers", nacosConfig.Servers), zap.Error(err))
 		return configClient, err
 	}
 

@@ -5,6 +5,7 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/config_client"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 	"go-web-template/base/lib/logger"
+	"go.uber.org/zap"
 	"strings"
 	"sync"
 )
@@ -34,8 +35,7 @@ func NewConfigCache(configClient config_client.IConfigClient) *ConfigCache {
 
 // InitConfig  初始化配置
 func (n *ConfigCache) InitConfig(ctx context.Context, group, dataId string, unmarshalFunc UnmarshalDataFunc) {
-	logger.SInfoF(ctx, "InitConfig init nacos config. group:%s, data id:%s, unmarshal func:%v",
-		group, dataId, unmarshalFunc)
+	logger.Info(ctx, "InitConfig init nacos config.", zap.String("group", group), zap.String("dataId", dataId), zap.Any("unmarshalFunc", unmarshalFunc))
 
 	n.listenConfig(ctx, group, dataId)
 
@@ -48,15 +48,14 @@ func (n *ConfigCache) InitConfig(ctx context.Context, group, dataId string, unma
 	n.cacheDataMap.Store(dataUid(group, dataId), data)
 	configData, err := n.configClient.GetConfig(vo.ConfigParam{DataId: dataId, Group: group})
 	if err != nil {
-		logger.SWarnF(ctx, "InitConfig get nacos config failed. group:%s, data id:%s, data:%s",
-			group, dataId, configData)
+		logger.Warn(ctx, "InitConfig get nacos config failed.", zap.String("group", group), zap.String("dataId", dataId), zap.String("configData", configData))
 		return
 	}
 
 	unmarshalResult, err := unmarshalFunc(configData)
 	if err != nil {
-		logger.SWarnF(ctx, "InitConfig write config data failed. group:%s, data id:%s, data:%s",
-			group, dataId, configData)
+		logger.Warn(ctx, "InitConfig write config data failed.",
+			zap.String("group", group), zap.String("dataId", dataId), zap.String("configData", configData))
 	} else {
 		data.data = unmarshalResult
 		data.state.enable()
@@ -68,7 +67,7 @@ func (n *ConfigCache) InitConfig(ctx context.Context, group, dataId string, unma
 func (n *ConfigCache) GetConfig(ctx context.Context, group, dataId string) interface{} {
 	value, ok := n.cacheDataMap.Load(dataUid(group, dataId))
 	if !ok {
-		logger.SInfoF(ctx, "GetConfig config cache not found.group:%s, data id:%s", group, dataId)
+		logger.Info(ctx, "GetConfig config cache not found.", zap.String("group", group), zap.String("dataId", dataId))
 		return nil
 	}
 	cData := value.(*cacheData)
@@ -86,19 +85,19 @@ func (n *ConfigCache) listenConfig(ctx context.Context, group, dataId string) {
 		OnChange: n.updateConfig(ctx),
 	})
 	if err != nil {
-		logger.SWarnF(ctx, "listenConfig listen config failed. group:%s, data id:%s", group, dataId)
+		logger.Warn(ctx, "listenConfig listen config failed.", zap.String("group", group), zap.String("dataId", dataId))
 	}
 }
 
 func (n *ConfigCache) updateConfig(ctx context.Context) func(namespace, group, dataId, data string) {
 	return func(namespace, group, dataId, data string) {
-		logger.SInfoF(ctx, "updateConfig listen config change. namespace:%s, group:%s, data id:%s, data:%s",
-			namespace, group, dataId, data)
+		logger.Info(ctx, "updateConfig listen config change.",
+			zap.String("namespace", namespace), zap.String("group", group), zap.String("dataId", dataId), zap.String("data", data))
 
 		cDataInterface, ok := n.cacheDataMap.Load(dataUid(group, dataId))
 		if !ok {
-			logger.SInfoF(ctx, "updateConfig config cache not found.namespace:%s, group:%s, data id:%s, data:%s",
-				namespace, group, dataId, data)
+			logger.Info(ctx, "updateConfig config cache not found.",
+				zap.String("namespace", namespace), zap.String("group", group), zap.String("dataId", dataId), zap.String("data", data))
 			return
 		}
 
@@ -106,8 +105,8 @@ func (n *ConfigCache) updateConfig(ctx context.Context) func(namespace, group, d
 		unmarshalData, err := cData.unmarshalDataFunc(data)
 		if err != nil {
 			cData.state.disable()
-			logger.SWarnF(ctx, "updateConfig listen config unmarshal data filed. namespace:%s, group:%s, data id:%s, data:%s",
-				namespace, group, dataId, data)
+			logger.Warn(ctx, "updateConfig listen config unmarshal data filed.",
+				zap.String("namespace", namespace), zap.String("group", group), zap.String("dataId", dataId), zap.String("data", data))
 			return
 		}
 		cData.data = unmarshalData

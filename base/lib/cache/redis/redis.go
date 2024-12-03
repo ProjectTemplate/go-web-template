@@ -41,7 +41,7 @@ func GetClient(ctx context.Context, name string) *redis.Client {
 func Init(ctx context.Context, redisConfigs map[string]config.Redis) {
 
 	if len(redisConfigs) == 0 {
-		logger.SErrorF(ctx, "Init Redis, redis config is empty, configs:+%v", redisConfigs)
+		logger.Error(ctx, "Init Redis, redis config is empty", zap.Any("redisConfigs", redisConfigs))
 		panic("Init Redis, redis config is empty")
 	}
 

@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"gorm.io/gorm/logger"
@@ -32,7 +33,7 @@ func (g *GormLogger) Info(ctx context.Context, s string, i ...interface{}) {
 		return
 	}
 
-	localLogger.SInfoF(ctx, s, i)
+	localLogger.Info(ctx, fmt.Sprintf(s, i...))
 }
 
 func (g *GormLogger) Warn(ctx context.Context, s string, i ...interface{}) {
@@ -40,7 +41,7 @@ func (g *GormLogger) Warn(ctx context.Context, s string, i ...interface{}) {
 		return
 	}
 
-	localLogger.SWarnF(ctx, s, i)
+	localLogger.Warn(ctx, fmt.Sprintf(s, i...))
 }
 
 func (g *GormLogger) Error(ctx context.Context, s string, i ...interface{}) {
@@ -48,7 +49,7 @@ func (g *GormLogger) Error(ctx context.Context, s string, i ...interface{}) {
 		return
 	}
 
-	localLogger.SErrorF(ctx, s, i)
+	localLogger.Error(ctx, fmt.Sprintf(s, i...))
 }
 
 func (g *GormLogger) Trace(ctx context.Context, begin time.Time, fc func() (sql string, rowsAffected int64), err error) {
@@ -60,11 +61,11 @@ func (g *GormLogger) Trace(ctx context.Context, begin time.Time, fc func() (sql 
 
 	//打印错误日志
 	if err != nil {
-		localLogger.SErrorF(ctx, "seq error, | sql=%v, rows=%v, elapsed=%v", sql, rows, elapsed)
+		localLogger.Error(ctx, fmt.Sprintf("seq error, | sql=%v, rows=%v, elapsed=%v", sql, rows, elapsed))
 	}
 
 	// 打印慢查询日志
 	if g.SlowThreshold != 0 && elapsed > g.SlowThreshold {
-		localLogger.SWarnF(ctx, "database slow Log, | sql=%v, rows=%v, elapsed=%v", sql, rows, elapsed)
+		localLogger.Warn(ctx, fmt.Sprintf("database slow Log, | sql=%v, rows=%v, elapsed=%v", sql, rows, elapsed))
 	}
 }

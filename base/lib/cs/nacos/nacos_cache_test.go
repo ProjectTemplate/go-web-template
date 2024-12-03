@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go-web-template/base/lib/config"
 	"go-web-template/base/lib/logger"
+	"go.uber.org/zap"
 	"strconv"
 	"testing"
 	"time"
@@ -33,7 +34,7 @@ func TestNacosCache(t *testing.T) {
 				Group:   group,
 				Content: strconv.Itoa(i),
 			})
-			logger.SInfoF(background, "set number:%d", i)
+			logger.Info(background, "set number", zap.Int("number", i))
 			assert.Nil(t, err)
 			assert.True(t, publishConfig)
 			time.Sleep(time.Millisecond * 300)
@@ -45,7 +46,7 @@ func TestNacosCache(t *testing.T) {
 			numberI := cache.GetConfig(background, group, dataId)
 			number, ok := numberI.(int)
 			assert.True(t, ok)
-			logger.SInfoF(background, "number:%d", number)
+			logger.Info(background, "number", zap.Int("number", number))
 			time.Sleep(time.Millisecond * 500)
 		}
 	}()
