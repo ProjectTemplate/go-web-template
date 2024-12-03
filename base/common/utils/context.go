@@ -33,10 +33,6 @@ func GetSpan(ctx context.Context) *Span {
 	return &Span{}
 }
 
-func EndSpan(ctx context.Context) {
-	GetSpan(ctx).End()
-}
-
 func WithDomain(parent context.Context, domain string) context.Context {
 	return context.WithValue(parent, constant.ContextKeyDomain, domain)
 }

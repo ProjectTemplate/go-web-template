@@ -20,6 +20,9 @@ func WithHttpField(ctx context.Context, fields ...zap.Field) []zap.Field {
 // WithSpanField 添加公用的Span日志字段
 func WithSpanField(ctx context.Context, fields ...zap.Field) []zap.Field {
 	span := utils.GetSpan(ctx)
+	span.End()
+	//在这里统一结束 Span
+
 	commonFieldCount := 7
 	result := make([]zap.Field, commonFieldCount, len(fields)+commonFieldCount)
 	result[0] = zap.String(constant.LoggerKeyType, constant.LoggerTypeSpan)
@@ -29,5 +32,6 @@ func WithSpanField(ctx context.Context, fields ...zap.Field) []zap.Field {
 	result[4] = zap.Int64(constant.LoggerKeySpanStartUs, span.GetStartTime())
 	result[5] = zap.Int64(constant.LoggerKeySpanEndUs, span.GetEndTime())
 	result[6] = zap.Int64(constant.LoggerKeySpanDurationUs, span.GetDuration())
+
 	return append(result, fields...)
 }

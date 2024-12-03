@@ -35,13 +35,11 @@ func (p *PingPong) Ping(ginCtx *gin.Context) {
 func invokeServiceA(ctx context.Context) {
 	childCtx := utils.WithChildSpan(ctx, "serviceA")
 	time.Sleep(time.Millisecond * time.Duration(rand.Int()%1000))
-	utils.EndSpan(childCtx)
 	logger.Info(childCtx, "serviceA time cost", logger.WithSpanField(childCtx)...)
 }
 
 func invokeServiceB(ctx context.Context) {
 	childCtx := utils.WithChildSpan(ctx, "serviceA")
 	time.Sleep(time.Millisecond * time.Duration(rand.Int()%1000))
-	utils.EndSpan(childCtx)
 	logger.Info(childCtx, "serviceA time cost", logger.WithSpanField(childCtx)...)
 }
