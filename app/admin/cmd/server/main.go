@@ -7,6 +7,7 @@ import (
 	"go-web-template/app/admin/internal/server"
 	"go-web-template/base/lib/signal"
 	"path/filepath"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -36,7 +37,8 @@ func initCommandLineFlag() {
 
 func main() {
 
-	background := context.Background()
+	ctx := context.Background()
+	ctx = utils.WithStartTime(ctx, time.Now())
 
 	initCommandLineFlag()
 
@@ -45,7 +47,7 @@ func main() {
 	logger.Init(global.Configs.App.Name, global.Configs.LoggerConfig)
 	loggerFlushError := logger.Flush()
 
-	logger.Info(background, "start server.", zap.String("confFile", confFile), zap.Any("configs", global.Configs))
+	logger.Info(ctx, "start server.", zap.String("confFile", confFile), zap.Any("configs", global.Configs))
 
 	ginMode := gin.ReleaseMode
 	if global.Configs.Server.Debug {
@@ -70,16 +72,16 @@ func main() {
 		}
 		err := r.Run(address)
 		if err != nil {
-			logger.Error(background, "server run error", zap.Error(err))
+			logger.Error(ctx, "server run error", zap.Error(err))
 		}
 		utils.PanicAndPrintIfNotNil(err)
 	}()
 
 	//监听停止信号
-	signal.HandleSignal(background, func() {
+	signal.HandleSignal(ctx, func() {
 		err := logger.Flush()
 		if err.Error() != loggerFlushError.Error() {
-			logger.Error(background, "logger flush error", zap.Error(err))
+			logger.Error(ctx, "logger flush error", zap.Error(err))
 		}
 	})
 }
