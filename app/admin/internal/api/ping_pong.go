@@ -1,8 +1,10 @@
 package api
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"go-web-template/app/admin/internal/model"
+	"go-web-template/base/common/utils"
 	"go-web-template/base/lib/gin/response"
 	"go-web-template/base/lib/logger"
 	"math/rand"
@@ -16,11 +18,30 @@ func NewPingPong() *PingPong {
 	return &PingPong{}
 }
 
-func (p *PingPong) Ping(ctx *gin.Context) {
+func (p *PingPong) Ping(ginCtx *gin.Context) {
+	ctx := ginCtx.Request.Context()
+
+	logger.Info(ctx, "ping pong start")
+	invokeServiceA(ctx)
+	invokeServiceB(ctx)
+	logger.Info(ctx, "ping pong end")
+
 	pongResponse := model.PingPongResponse{
 		Message: "pong",
 	}
-	time.Sleep(time.Millisecond * time.Duration(rand.Int()/1000))
-	logger.Info(ctx.Request.Context(), "ping pong")
-	response.Success(ctx, pongResponse)
+	response.Success(ginCtx, pongResponse)
+}
+
+func invokeServiceA(ctx context.Context) {
+	childCtx := utils.WithChildSpan(ctx, "serviceA")
+	time.Sleep(time.Millisecond * time.Duration(rand.Int()%1000))
+	utils.EndSpan(childCtx)
+	logger.Info(childCtx, "serviceA time cost", logger.WithSpanField(childCtx)...)
+}
+
+func invokeServiceB(ctx context.Context) {
+	childCtx := utils.WithChildSpan(ctx, "serviceA")
+	time.Sleep(time.Millisecond * time.Duration(rand.Int()%1000))
+	utils.EndSpan(childCtx)
+	logger.Info(childCtx, "serviceA time cost", logger.WithSpanField(childCtx)...)
 }

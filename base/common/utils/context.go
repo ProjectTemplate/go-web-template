@@ -17,16 +17,24 @@ func GetTraceId(ctx context.Context) string {
 	return ""
 }
 
+func WithChildSpan(ctx context.Context, childName string) context.Context {
+	child := GetSpan(ctx).Child(childName)
+	return WithSpan(ctx, child)
+}
+
 func WithSpan(parent context.Context, span *Span) context.Context {
 	return context.WithValue(parent, constant.ContextKeySpan, span)
 }
 
-func GetSpan(ctx context.Context) Span {
+func GetSpan(ctx context.Context) *Span {
 	if span, ok := ctx.Value(constant.ContextKeySpan).(*Span); ok {
-		// todo 处理并发问题
-		return *span
+		return span
 	}
-	return Span{}
+	return &Span{}
+}
+
+func EndSpan(ctx context.Context) {
+	GetSpan(ctx).End()
 }
 
 func WithDomain(parent context.Context, domain string) context.Context {

@@ -52,6 +52,7 @@ func (s *Span) Child(childName string) *Span {
 }
 
 // Next 获取下一个Span
+// 目前Next好想没有太大用处，先保留后面删除
 func (s *Span) Next(name string) *Span {
 	nextSpanNumber := s.number.Add(1)
 	span := Span{
