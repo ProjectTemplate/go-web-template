@@ -99,7 +99,7 @@ func initContext() context.Context {
 
 	ctx = utils.WithDomain(ctx, "www.baidu.com")
 	ctx = utils.WithTraceId(ctx, "trace-1231231232")
-	ctx = utils.WithSpan(ctx, "1")
+	ctx = utils.WithSpan(ctx, utils.NewSpan("", ""))
 	ctx = utils.WithURL(ctx, "hello?name=world")
 	ctx = utils.WithStartTime(ctx, time.Now())
 	return ctx
