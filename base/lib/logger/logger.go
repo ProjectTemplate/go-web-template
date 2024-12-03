@@ -134,8 +134,8 @@ func timeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 
 func checkNil() {
 	if logger == nil {
-		fmt.Println("loggerSugared is nil, please init logger first")
-		panic("loggerSugared is nil, please init logger first")
+		fmt.Println("logger is nil, please init logger first")
+		panic("logger is nil, please init logger first")
 	}
 }
 
