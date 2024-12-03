@@ -23,6 +23,7 @@ func NewSpan(parentSpan, name string) *Span {
 		name:       name,
 		number:     atomic.Int64{},
 		startTime:  time.Now(),
+		entTime:    time.Now(),
 	}
 
 	//从一开始
@@ -38,6 +39,8 @@ func (s *Span) Child(childName string) *Span {
 		parentSpan: strings.Join([]string{s.parentSpan, formatInt}, "."),
 		name:       childName,
 		number:     atomic.Int64{},
+		startTime:  time.Now(),
+		entTime:    time.Now(),
 	}
 }
 
@@ -48,19 +51,45 @@ func (s *Span) Next(name string) *Span {
 		parentSpan: s.parentSpan,
 		name:       name,
 		number:     atomic.Int64{},
+		startTime:  time.Now(),
+		entTime:    time.Now(),
 	}
 	span.number.Store(nextSpanNumber)
 
 	return &span
 }
 
-func (s *Span) Span() string {
-	load := s.number.Load()
-	return strings.Join([]string{s.parentSpan, strconv.FormatInt(load, 10)}, ".")
-}
-
 func (s *Span) End() {
 	s.entTime = time.Now()
+}
+
+func (s *Span) Span() string {
+	spanNumber := s.number.Load()
+	if s.parentSpan == "" {
+		return strconv.FormatInt(spanNumber, 10)
+	}
+
+	return strings.Join([]string{s.parentSpan, strconv.FormatInt(spanNumber, 10)}, ".")
+}
+
+func (s *Span) GetParentSpan() string {
+	return s.parentSpan
+}
+
+func (s *Span) GetName() string {
+	return s.name
+}
+
+func (s *Span) GetStartTime() int64 {
+	return s.startTime.UnixMicro()
+}
+
+func (s *Span) GetEndTime() int64 {
+	return s.entTime.UnixMicro()
+}
+
+func (s *Span) GetDuration() int64 {
+	return s.entTime.Sub(s.startTime).Microseconds()
 }
 
 func Next(ctx context.Context, name string) *Span {
@@ -68,7 +97,6 @@ func Next(ctx context.Context, name string) *Span {
 	if ok {
 		return span.Next(name)
 	}
-
 	return nil
 }
 

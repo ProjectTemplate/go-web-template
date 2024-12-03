@@ -194,11 +194,12 @@ func formatMessage(template string, args ...interface{}) string {
 
 func commonLoggerKeyValues(ctx context.Context) []interface{} {
 	startTime := utils.GetStartTime(ctx)
+	span := utils.GetSpan(ctx)
 	return []interface{}{
 		constant.LoggerKeyTimestamp, time.Now().UnixMilli(),
-		constant.LoggerKeyDuration, time.Since(startTime).Milliseconds(),
-		constant.HeaderKeyTraceId, utils.GetTraceId(ctx),
-		constant.ContextKeySpan, utils.GetSpan(ctx),
+		constant.LoggerKeyDurationUs, time.Since(startTime).Microseconds(),
+		constant.LoggerKeyTraceId, utils.GetTraceId(ctx),
+		constant.ContextKeySpan, span.Span(),
 	}
 }
 
