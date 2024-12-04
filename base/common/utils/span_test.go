@@ -7,28 +7,6 @@ import (
 	"testing"
 )
 
-func TestSpan(t *testing.T) {
-	span := NewSpan("", "root")
-	assert.Equal(t, "1", span.Span())
-
-	span = span.Next("root")
-	assert.Equal(t, "2", span.Span())
-
-	span = span.Next("root")
-	assert.Equal(t, "3", span.Span())
-}
-
-func TestWithParent(t *testing.T) {
-	span := NewSpan("1", "child")
-	assert.Equal(t, "1.1", span.Span())
-
-	span = span.Next("child")
-	assert.Equal(t, "1.2", span.Span())
-
-	span = span.Next("child")
-	assert.Equal(t, "1.3", span.Span())
-}
-
 func TestChild(t *testing.T) {
 	parent := NewSpan("", "parent")
 
@@ -48,20 +26,18 @@ func TestParallel(t *testing.T) {
 
 	span := NewSpan("1", "")
 	for i := 0; i < goRoutineCount; i++ {
-		go invokeNext(span, count, waitGroup)
+		go invokeChild(span, count, waitGroup)
 	}
 
 	waitGroup.Wait()
 
-	spanResult := strconv.Itoa(goRoutineCount*count + 1)
-
-	assert.Equal(t, "1."+spanResult, span.Span())
+	assert.Equal(t, int64(count*goRoutineCount), span.childSpanNumber.Load())
 }
 
-func invokeNext(span *Span, count int, waitGroup *sync.WaitGroup) {
+func invokeChild(span *Span, count int, waitGroup *sync.WaitGroup) {
 	defer waitGroup.Done()
 
 	for i := 0; i < count; i++ {
-		span.Next("")
+		span.Child("child_" + strconv.Itoa(i))
 	}
 }

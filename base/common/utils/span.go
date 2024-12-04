@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"context"
 	"strconv"
 	"strings"
 	"sync/atomic"
@@ -9,61 +8,44 @@ import (
 )
 
 type Span struct {
-	parentSpan string
-	name       string
-	number     atomic.Int64
-	startTime  time.Time
-	entTime    time.Time
+	parentSpan      string
+	name            string
+	span            int64
+	childSpanNumber atomic.Int64
+	startTime       time.Time
+	entTime         time.Time
 }
 
-// NewSpan 创建一个新的 Span，每次处理请求的时候理论上只生成一个 Span 即可
+// NewSpan 创建一个新的 Span
 func NewSpan(parentSpan, name string) *Span {
-	span := &Span{
-		parentSpan: parentSpan,
-		name:       name,
-		number:     atomic.Int64{},
-		startTime:  time.Now(),
-		entTime:    time.Now(),
-	}
-
-	//从一开始
-	span.number.Store(1)
+	span := initSpan(parentSpan, name)
 	return span
 }
 
 func (s *Span) Child(childName string) *Span {
-	spanNumber := s.number.Load()
+	nextChildSpanNumber := s.childSpanNumber.Add(1)
 
-	parentSpan := strconv.FormatInt(spanNumber, 10)
+	parentSpan := strconv.FormatInt(s.span, 10)
 	if s.parentSpan != "" {
 		parentSpan = strings.Join([]string{s.parentSpan, parentSpan}, ".")
 	}
 
-	span := &Span{
-		parentSpan: parentSpan,
-		name:       childName,
-		number:     atomic.Int64{},
-		startTime:  time.Now(),
-		entTime:    time.Now(),
-	}
+	span := initSpan(parentSpan, childName)
+	span.span = nextChildSpanNumber
 
-	span.number.Store(1)
 	return span
 }
 
-// Next 获取下一个Span
-// 目前Next好想没有太大用处，先保留后面删除
-func (s *Span) Next(name string) *Span {
-	nextSpanNumber := s.number.Add(1)
+func initSpan(parentSpan string, name string) *Span {
 	span := Span{
-		parentSpan: s.parentSpan,
-		name:       name,
-		number:     atomic.Int64{},
-		startTime:  time.Now(),
-		entTime:    time.Now(),
+		parentSpan:      parentSpan,
+		name:            name,
+		span:            1,
+		childSpanNumber: atomic.Int64{},
+		startTime:       time.Now(),
+		entTime:         time.Now(),
 	}
-	span.number.Store(nextSpanNumber)
-
+	span.childSpanNumber.Store(0)
 	return &span
 }
 
@@ -72,12 +54,11 @@ func (s *Span) End() {
 }
 
 func (s *Span) Span() string {
-	spanNumber := s.number.Load()
 	if s.parentSpan == "" {
-		return strconv.FormatInt(spanNumber, 10)
+		return strconv.FormatInt(s.span, 10)
 	}
 
-	return strings.Join([]string{s.parentSpan, strconv.FormatInt(spanNumber, 10)}, ".")
+	return strings.Join([]string{s.parentSpan, strconv.FormatInt(s.span, 10)}, ".")
 }
 
 func (s *Span) GetParentSpan() string {
@@ -98,21 +79,4 @@ func (s *Span) GetEndTime() int64 {
 
 func (s *Span) GetDuration() int64 {
 	return s.entTime.Sub(s.startTime).Microseconds()
-}
-
-func Next(ctx context.Context, name string) *Span {
-	span, ok := ctx.Value("span").(*Span)
-	if ok {
-		return span.Next(name)
-	}
-	return nil
-}
-
-func Child(ctx context.Context, name string) *Span {
-	span, ok := ctx.Value("span").(*Span)
-	if ok {
-		return span.Child(name)
-	}
-
-	return nil
 }

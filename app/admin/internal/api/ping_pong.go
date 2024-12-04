@@ -39,7 +39,7 @@ func invokeServiceA(ctx context.Context) {
 }
 
 func invokeServiceB(ctx context.Context) {
-	childCtx := utils.WithChildSpan(ctx, "serviceA")
+	childCtx := utils.WithChildSpan(ctx, "serviceB")
 	time.Sleep(time.Millisecond * time.Duration(rand.Int()%1000))
-	logger.Info(childCtx, "serviceA time cost", logger.WithSpanField(childCtx)...)
+	logger.Info(childCtx, "serviceB time cost", logger.WithSpanField(childCtx)...)
 }
