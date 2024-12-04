@@ -30,7 +30,7 @@ func GetSpan(ctx context.Context) *Span {
 	if span, ok := ctx.Value(constant.ContextKeySpan).(*Span); ok {
 		return span
 	}
-	return &Span{}
+	return EmptySpan
 }
 
 func WithDomain(parent context.Context, domain string) context.Context {
@@ -74,5 +74,5 @@ func GetStartTime(ctx context.Context) time.Time {
 	if startTime, ok := ctx.Value(constant.ContextKeyStartTime).(time.Time); ok {
 		return startTime
 	}
-	return time.Time{}
+	return time.Now()
 }

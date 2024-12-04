@@ -33,6 +33,6 @@ func InitContext(projectName string) gin.HandlerFunc {
 		c.Next()
 
 		//打印服务耗时
-		logger.Info(ctx, "endpoint response time", logger.WithSpanField(ctx)...)
+		logger.SpanSuccess(ctx, "endpoint response time")
 	}
 }

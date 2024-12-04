@@ -23,6 +23,10 @@ func NewSpan(parentSpan, name string) *Span {
 }
 
 func (s *Span) Child(childName string) *Span {
+	if s == EmptySpan {
+		return EmptySpan
+	}
+
 	nextChildSpanNumber := s.childSpanNumber.Add(1)
 
 	parentSpan := strconv.FormatInt(s.span, 10)
@@ -54,6 +58,10 @@ func (s *Span) End() {
 }
 
 func (s *Span) Span() string {
+	if s == EmptySpan {
+		return ""
+	}
+
 	if s.parentSpan == "" {
 		return strconv.FormatInt(s.span, 10)
 	}

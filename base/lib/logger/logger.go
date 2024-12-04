@@ -163,10 +163,12 @@ func commonLoggerKeyValues(ctx context.Context) []interface{} {
 	startTime := utils.GetStartTime(ctx)
 	span := utils.GetSpan(ctx)
 	return []interface{}{
+		constant.LoggerKeyType, constant.LoggerTypeLog,
 		constant.LoggerKeyTimestamp, time.Now().UnixMilli(),
 		constant.LoggerKeyDurationUs, time.Since(startTime).Microseconds(),
 		constant.LoggerKeyTraceId, utils.GetTraceId(ctx),
-		constant.ContextKeySpan, span.Span(),
+		constant.LoggerKeyParentSpan, span.GetParentSpan(),
+		constant.LoggerKeySpan, span.Span(),
 	}
 }
 

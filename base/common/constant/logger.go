@@ -18,4 +18,5 @@ const (
 
 const (
 	LoggerTypeSpan = "span"
+	LoggerTypeLog  = "log"
 )

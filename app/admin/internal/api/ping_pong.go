@@ -33,13 +33,14 @@ func (p *PingPong) Ping(ginCtx *gin.Context) {
 }
 
 func invokeServiceA(ctx context.Context) {
-	childCtx := utils.WithChildSpan(ctx, "serviceA")
+	ctx = utils.WithChildSpan(ctx, "serviceA")
 	time.Sleep(time.Millisecond * time.Duration(rand.Int()%1000))
-	logger.SpanSuccess(childCtx, "success")
+	logger.Info(ctx, "serviceA success")
+	logger.SpanSuccess(ctx, "success")
 }
 
 func invokeServiceB(ctx context.Context) {
-	childCtx := utils.WithChildSpan(ctx, "serviceB")
+	ctx = utils.WithChildSpan(ctx, "serviceB")
 	time.Sleep(time.Millisecond * time.Duration(rand.Int()%1000))
-	logger.SpanFailed(childCtx, "failed")
+	logger.SpanFailed(ctx, "failed")
 }
