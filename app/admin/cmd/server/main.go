@@ -4,8 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"go-web-template/app/admin/internal/server"
-	"go-web-template/base/lib/signal"
 	"path/filepath"
 	"time"
 
@@ -13,11 +11,13 @@ import (
 	"go.uber.org/zap"
 
 	"go-web-template/app/admin/internal/global"
+	"go-web-template/app/admin/internal/server"
 	"go-web-template/base/common/utils"
 	"go-web-template/base/lib/config"
 	"go-web-template/base/lib/gin/response"
 	"go-web-template/base/lib/logger"
 	"go-web-template/base/lib/middleware"
+	"go-web-template/base/lib/signal"
 )
 
 // confFile 配置文件路径
