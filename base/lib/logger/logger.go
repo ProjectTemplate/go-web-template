@@ -96,9 +96,9 @@ func Init(projectName string, loggerConfig config.LoggerConfig) {
 
 	var cores = make([]zapcore.Core, 0, 2)
 	//file logger
-	newCore := zapcore.NewCore(logFileEncoder, output, levelEnable)
-	newCore = newCore.With([]zap.Field{zap.String("projectName", projectName)})
-	cores = append(cores, newCore)
+	logFileCore := zapcore.NewCore(logFileEncoder, output, levelEnable)
+	logFileCore = logFileCore.With([]zap.Field{zap.String("projectName", projectName)})
+	cores = append(cores, logFileCore)
 
 	//console logger
 	if loggerConfig.Console {
