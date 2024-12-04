@@ -80,7 +80,7 @@ func main() {
 	//监听停止信号
 	signal.HandleSignal(ctx, func() {
 		err := logger.Flush()
-		if err.Error() != loggerFlushError.Error() {
+		if err != nil && err.Error() != loggerFlushError.Error() {
 			logger.Error(ctx, "logger flush error", zap.Error(err))
 		}
 	})
