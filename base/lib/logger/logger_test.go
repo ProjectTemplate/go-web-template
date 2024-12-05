@@ -103,3 +103,13 @@ func TestMultiOpen(t *testing.T) {
 
 	waitGroup.Wait()
 }
+
+// BenchmarkLogger-8   	  374352	      3036 ns/op
+func BenchmarkLogger(b *testing.B) {
+	initLogger("TestMultiSingle")
+	defer Flush()
+
+	for i := 0; i < b.N; i++ {
+		Info(context.Background(), "测试打印日志", zap.String("name", "name"))
+	}
+}
