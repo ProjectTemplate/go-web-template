@@ -55,7 +55,9 @@ func Get(ctx context.Context, requestUrl string, params map[string]interface{}, 
 	ctx = utils.WithChildSpan(ctx, "get:"+requestUrl)
 
 	req := fasthttp.AcquireRequest()
+	defer fasthttp.ReleaseRequest(req)
 	resp := fasthttp.AcquireResponse()
+	defer fasthttp.ReleaseResponse(resp)
 
 	parse, err := url.Parse(requestUrl)
 	if err != nil {
@@ -63,13 +65,17 @@ func Get(ctx context.Context, requestUrl string, params map[string]interface{}, 
 		return err
 	}
 
+	query := parse.Query()
+	// 将参数拼接到url中
+	for key, value := range params {
+		query.Add(key, value.(string))
+	}
 
 	req.SetRequestURI(requestUrl)
 
 	req.Header.SetMethod(fasthttp.MethodGet)
 
 	err = client.Do(req, resp)
-	fasthttp.ReleaseRequest(req)
 	if err != nil {
 		logger.SpanFailed(ctx, "http get failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers))
 		return err
@@ -87,7 +93,6 @@ func Get(ctx context.Context, requestUrl string, params map[string]interface{}, 
 		return err
 	}
 
-	fasthttp.ReleaseResponse(resp)
 	logger.SpanSuccess(ctx, "http get success", zap.Int("code", statusCode), zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers))
 	return nil
 }
@@ -162,20 +167,4 @@ func httpConnError(err error) (string, bool) {
 	}
 
 	return errName, known
-}
-
-func mapToHttpParams(params map[string]interface{}) map[string]string {
-	result := make(map[string]string)
-	for key, value := range params {
-		valueType := reflect.TypeOf(value)
-		if valueType.Kind() == reflect.String {
-			result[key] = value.(string)
-			continue
-		}
-
-		if
-
-
-	}
-	return result
 }
