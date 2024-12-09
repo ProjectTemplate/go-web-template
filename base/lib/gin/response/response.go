@@ -10,6 +10,7 @@ type Response struct {
 	Code    string      `json:"code"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
+	Stat    int         `json:"stat"`
 	TraceId string      `json:"traceId"`
 }
 
@@ -18,6 +19,7 @@ func newResponse(c *gin.Context, data interface{}, reason Reason) Response {
 		Code:    reason.Code,
 		Message: reason.Message,
 		Data:    data,
+		Stat:    1,
 		TraceId: utils.GetTraceId(c.Request.Context()),
 	}
 }

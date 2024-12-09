@@ -1,11 +1,3 @@
-[app]
-    name = "go-web-template"
-
-[server]
-    name = "go-web-template"
-    address = "0.0.0.0:8080"
-    debug = true
-
 [log]
     console = true
     level = "DEBUG"
@@ -14,3 +6,8 @@
     max_size = 100
     max_backups = 30
     max_age = 15
+
+[fast_http]
+    read_time_out = "5s"
+    write_time_out = "5s"
+    max_idle_conn_duration = "1h"

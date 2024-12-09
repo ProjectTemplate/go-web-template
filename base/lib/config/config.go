@@ -18,7 +18,8 @@ type Configs struct {
 	App          App              `mapstructure:"app"`
 	Server       Server           `mapstructure:"server"`
 	LoggerConfig LoggerConfig     `mapstructure:"log"`
-	Mysql        map[string]DB    `mapstructure:"mysql"`
+	FastHttp     FastHttp         `mapstructure:"fast_http"`
+	Mysql        map[string]MySQL `mapstructure:"mysql"`
 	Nacos        map[string]Nacos `mapstructure:"nacos"`
 	Redis        map[string]Redis `mapstructure:"redis"`
 	Kafka        map[string]Kafka `mapstructure:"kafka"`
@@ -53,7 +54,15 @@ type LoggerConfig struct {
 	MaxAge int `mapstructure:"max_age"`
 }
 
-type DB struct {
+// FastHttp 配置
+type FastHttp struct {
+	ReadTimeOut         time.Duration `mapstructure:"read_time_out"`
+	WriteTimeOut        time.Duration `mapstructure:"write_time_out"`
+	MaxIdleConnDuration time.Duration `mapstructure:"max_idle_conn_duration"`
+}
+
+// MySQL 数据库配置
+type MySQL struct {
 	DSN                []string      `mapstructure:"dsn"`
 	MaxOpenConnections int           `mapstructure:"max_open_connections"`
 	MaxIdleConnections int           `mapstructure:"max_idle_connections"`

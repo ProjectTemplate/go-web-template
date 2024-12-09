@@ -40,7 +40,7 @@ func GetDB(ctx context.Context, name string) *gorm.DB {
 //	max_idle_time = "10m"      连接的最大空闲时间
 //	show_log = false           是否展示MySQL日志
 //	slow_threshold = "1ms"     慢查询阈值
-func Init(ctx context.Context, dbConfigs map[string]config.DB) {
+func Init(ctx context.Context, dbConfigs map[string]config.MySQL) {
 	logger.Info(ctx, "init MySQL, config info: ", zap.Any("config", dbConfigs))
 	dbMap = make(map[string]*gorm.DB)
 

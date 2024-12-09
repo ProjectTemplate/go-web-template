@@ -7,7 +7,6 @@ import (
 	"go-web-template/base/common/utils"
 	"go-web-template/base/lib/gin/response"
 	"go-web-template/base/lib/logger"
-	"math/rand"
 	"time"
 )
 
@@ -34,13 +33,13 @@ func (p *PingPong) Ping(ginCtx *gin.Context) {
 
 func invokeServiceA(ctx context.Context) {
 	ctx = utils.WithChildSpan(ctx, "serviceA")
-	time.Sleep(time.Millisecond * time.Duration(rand.Int()%1000))
+	time.Sleep(time.Millisecond * 10)
 	logger.Info(ctx, "serviceA success")
 	logger.SpanSuccess(ctx, "success")
 }
 
 func invokeServiceB(ctx context.Context) {
 	ctx = utils.WithChildSpan(ctx, "serviceB")
-	time.Sleep(time.Millisecond * time.Duration(rand.Int()%1000))
+	time.Sleep(time.Millisecond * 20)
 	logger.SpanFailed(ctx, "failed")
 }

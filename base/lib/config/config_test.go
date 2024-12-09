@@ -28,6 +28,10 @@ func TestParseConfig(t *testing.T) {
 	assert.Equal(t, 30, conf.LoggerConfig.MaxBackups)
 	assert.Equal(t, 15, conf.LoggerConfig.MaxAge)
 
+	assert.Equal(t, time.Millisecond*500, conf.FastHttp.ReadTimeOut)
+	assert.Equal(t, time.Millisecond*500, conf.FastHttp.WriteTimeOut)
+	assert.Equal(t, time.Hour, conf.FastHttp.MaxIdleConnDuration)
+
 	assert.NotEmpty(t, conf.Mysql)
 	assert.Equal(t, 1, len(conf.Mysql))
 	assert.Equal(t, "root:123456@tcp(127.0.0.1:3306)/test?charset=utf8&loc=Local&parseTime=True", conf.Mysql["test"].DSN[0])
