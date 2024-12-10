@@ -49,7 +49,7 @@ func Init(config config.FastHttp) {
 	})
 }
 
-// Get Get请求
+// GetTimeOut Get请求
 //
 // params: 请求参数，为结构体类型需要在字段后面加 url tag
 //
@@ -58,13 +58,8 @@ func Init(config config.FastHttp) {
 //		Age     int      `url:"age"`
 //		Friends []string `url:"friends"`
 //	}
-func Get(ctx context.Context, requestUrl string, params interface{}, headers map[string]string, timeOut time.Duration, result interface{}) error {
+func GetTimeOut(ctx context.Context, requestUrl string, params interface{}, headers map[string]string, timeOut time.Duration, result interface{}) error {
 	ctx = utils.WithChildSpan(ctx, "get:"+requestUrl)
-
-	req := fasthttp.AcquireRequest()
-	defer fasthttp.ReleaseRequest(req)
-	resp := fasthttp.AcquireResponse()
-	defer fasthttp.ReleaseResponse(resp)
 
 	//解析验证url
 	_, err := url.Parse(requestUrl)
@@ -87,10 +82,14 @@ func Get(ctx context.Context, requestUrl string, params interface{}, headers map
 
 	logger.Info(ctx, "request url", zap.String("url", requestUrl), zap.Any("header", headers))
 
+	req := fasthttp.AcquireRequest()
+	defer fasthttp.ReleaseRequest(req)
 	req.SetRequestURI(fmt.Sprintf("%s?%s", requestUrl, queryValues.Encode()))
 	req.Header.SetMethod(fasthttp.MethodGet)
 
 	//请求数据
+	resp := fasthttp.AcquireResponse()
+	defer fasthttp.ReleaseResponse(resp)
 	err = client.DoTimeout(req, resp, timeOut)
 	if err != nil {
 		logger.SpanFailed(ctx, "http get failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(err))
@@ -117,44 +116,55 @@ func Get(ctx context.Context, requestUrl string, params interface{}, headers map
 	return nil
 }
 
-// Post Post请求
-func Post(ctx context.Context, requestUrl string, params interface{}, headers map[string]string, timeOut time.Duration, result interface{}) error {
+// PostTimeOut Post请求
+func PostTimeOut(ctx context.Context, requestUrl string, params interface{}, headers map[string]string, timeOut time.Duration, result interface{}) error {
+	ctx = utils.WithChildSpan(ctx, "post:"+requestUrl)
+
+	//解析验证url
+	_, err := url.Parse(requestUrl)
+	if err != nil {
+		logger.SpanFailed(ctx, "parse url failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(err))
+		return err
+	}
+
 	req := fasthttp.AcquireRequest()
 	defer fasthttp.ReleaseRequest(req)
-
 	req.SetRequestURI(requestUrl)
-	req.Header.SetMethod(fasthttp.MethodPost)
 
+	// header
+	req.Header.SetMethod(fasthttp.MethodPost)
 	req.Header.SetContentType(constant.ContentTypeJson)
 	if headers[constant.HeaderKeyContextType] == constant.ContentTypeForm {
 		req.Header.SetContentType(constant.ContentTypeForm)
 	}
 
+	// body
 	marshal, err := sonic.Marshal(params)
 	if err != nil {
+		logger.SpanFailed(ctx, "json marshal failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(err))
 		return err
 	}
 	req.SetBody(marshal)
 
 	resp := fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseResponse(resp)
-
 	err = client.DoTimeout(req, resp, timeOut)
 	if err != nil {
+		logger.SpanFailed(ctx, "http post failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(err))
 		return err
 	}
 
-	statusCode := resp.StatusCode()
 	respBody := resp.Body()
 
-	if statusCode != http.StatusOK {
-		errInner := errors.New("data request failed , code:" + strconv.Itoa(statusCode))
+	if resp.StatusCode() != http.StatusOK {
+		errInner := errors.New("data request failed , code:" + strconv.Itoa(resp.StatusCode()))
+		logger.SpanFailed(ctx, "http post failed", zap.Int("code", resp.StatusCode()), zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(errInner))
 		return errInner
 	}
 
-	respEntity := &Entity{}
-	err = json.Unmarshal(respBody, respEntity)
+	err = json.Unmarshal(respBody, result)
 	if err != nil {
+		logger.SpanFailed(ctx, "json unmarshal failed", zap.Int("code", resp.StatusCode()), zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.String("data", string(respBody)), zap.Error(err))
 		return err
 	}
 
