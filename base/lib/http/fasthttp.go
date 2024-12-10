@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/bytedance/sonic"
+	"github.com/google/go-querystring/query"
 	"github.com/valyala/fasthttp"
 	"go-web-template/base/common/utils"
 	"go-web-template/base/lib/config"
@@ -51,7 +52,15 @@ func Init(config config.FastHttp) {
 }
 
 // Get Get请求
-func Get(ctx context.Context, requestUrl string, params map[string]interface{}, headers map[string]string, result interface{}) error {
+//
+// params: 请求参数，为结构体类型需要在字段后面加 url tag
+//
+//	type request struct {
+//		Name    string   `url:"name"`
+//		Age     int      `url:"age"`
+//		Friends []string `url:"friends"`
+//	}
+func Get(ctx context.Context, requestUrl string, params interface{}, headers map[string]string, result interface{}) error {
 	ctx = utils.WithChildSpan(ctx, "get:"+requestUrl)
 
 	req := fasthttp.AcquireRequest()
@@ -59,41 +68,54 @@ func Get(ctx context.Context, requestUrl string, params map[string]interface{}, 
 	resp := fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseResponse(resp)
 
-	parse, err := url.Parse(requestUrl)
+	//解析验证url
+	_, err := url.Parse(requestUrl)
 	if err != nil {
-		logger.SpanFailed(ctx, "url parse failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers))
+		logger.SpanFailed(ctx, "parse url failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(err))
 		return err
 	}
 
-	query := parse.Query()
-	// 将参数拼接到url中
-	for key, value := range params {
-		query.Add(key, value.(string))
+	//将结构体转换为url.Values，需要在结构体中添加tag:url
+	queryValues := url.Values{}
+	if params != nil {
+		queryValues, err = query.Values(params)
+		if err != nil {
+			logger.SpanFailed(ctx, "parse query params failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(err))
+			return err
+		}
 	}
 
-	req.SetRequestURI(requestUrl)
+	//设置参数
 
+	logger.Info(ctx, "request url", zap.String("url", requestUrl), zap.Any("header", headers))
+
+	req.SetRequestURI(fmt.Sprintf("%s?%s", requestUrl, queryValues.Encode()))
 	req.Header.SetMethod(fasthttp.MethodGet)
 
+	//请求数据
 	err = client.Do(req, resp)
 	if err != nil {
-		logger.SpanFailed(ctx, "http get failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers))
+		logger.SpanFailed(ctx, "http get failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(err))
 		return err
 	}
 
+	//状态码验证
 	statusCode := resp.StatusCode()
 	if statusCode != http.StatusOK {
-		logger.SpanFailed(ctx, "http get failed", zap.Int("code", statusCode), zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers))
-		return errors.New("data request failed , code:" + strconv.Itoa(statusCode))
+		errInner := errors.New("data request failed , code:" + strconv.Itoa(statusCode))
+		logger.SpanFailed(ctx, "http get failed", zap.Int("code", statusCode), zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(errInner))
+		return errInner
 	}
 
+	//反序列化参数
 	err = sonic.Unmarshal(resp.Body(), result)
 	if err != nil {
-		logger.SpanFailed(ctx, "json unmarshal failed", zap.Int("code", statusCode), zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.String("data", string(resp.Body())))
+		logger.SpanFailed(ctx, "json unmarshal failed", zap.Int("code", statusCode), zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.String("data", string(resp.Body())), zap.Error(err))
 		return err
 	}
 
-	logger.SpanSuccess(ctx, "http get success", zap.Int("code", statusCode), zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers))
+	logger.SpanSuccess(ctx, "http get success", zap.Int("code", statusCode), zap.String("url", requestUrl), zap.Any("header", headers))
+
 	return nil
 }
 

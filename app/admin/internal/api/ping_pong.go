@@ -19,7 +19,7 @@ func NewPingPong() *PingPong {
 
 func (p *PingPong) Ping(ginCtx *gin.Context) {
 	ctx := ginCtx.Request.Context()
-
+	
 	logger.Info(ctx, "ping pong start")
 	invokeServiceA(ctx)
 	invokeServiceB(ctx)
