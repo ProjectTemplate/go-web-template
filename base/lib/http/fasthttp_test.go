@@ -6,6 +6,7 @@ import (
 	"go-web-template/base/lib/config"
 	"go-web-template/base/lib/logger"
 	"testing"
+	"time"
 )
 
 func TestGet(t *testing.T) {
@@ -28,7 +29,7 @@ func TestGet(t *testing.T) {
 		Friends: []string{"name1", "name2"},
 	}
 
-	err := Get(background, "http://127.0.0.1:8080/ping", params, nil, result)
+	err := Get(background, "http://127.0.0.1:8080/ping", params, nil, time.Second, result)
 
 	assert.Nil(t, err)
 }

@@ -5,24 +5,22 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"go-web-template/base/common/constant"
+	"net/http"
+	"net/url"
+	"strconv"
+	"sync"
+	"time"
+
+	"go.uber.org/zap"
+
 	"github.com/bytedance/sonic"
 	"github.com/google/go-querystring/query"
 	"github.com/valyala/fasthttp"
 	"go-web-template/base/common/utils"
 	"go-web-template/base/lib/config"
 	"go-web-template/base/lib/logger"
-	"go.uber.org/zap"
-	"io"
-	"net/http"
-	"net/url"
-	"os"
-	"reflect"
-	"strconv"
-	"sync"
-	"time"
 )
-
-var headerContentTypeJson = []byte("application/json")
 
 var client *fasthttp.Client
 var clientOnce sync.Once
@@ -60,7 +58,7 @@ func Init(config config.FastHttp) {
 //		Age     int      `url:"age"`
 //		Friends []string `url:"friends"`
 //	}
-func Get(ctx context.Context, requestUrl string, params interface{}, headers map[string]string, result interface{}) error {
+func Get(ctx context.Context, requestUrl string, params interface{}, headers map[string]string, timeOut time.Duration, result interface{}) error {
 	ctx = utils.WithChildSpan(ctx, "get:"+requestUrl)
 
 	req := fasthttp.AcquireRequest()
@@ -93,7 +91,7 @@ func Get(ctx context.Context, requestUrl string, params interface{}, headers map
 	req.Header.SetMethod(fasthttp.MethodGet)
 
 	//请求数据
-	err = client.Do(req, resp)
+	err = client.DoTimeout(req, resp, timeOut)
 	if err != nil {
 		logger.SpanFailed(ctx, "http get failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(err))
 		return err
@@ -119,74 +117,46 @@ func Get(ctx context.Context, requestUrl string, params interface{}, headers map
 	return nil
 }
 
-func sendPostRequest() {
-	// per-request timeout
-	reqTimeout := time.Duration(100) * time.Millisecond
-
-	reqEntity := &Entity{
-		Name: "New entity",
-	}
-	reqEntityBytes, _ := json.Marshal(reqEntity)
-
+// Post Post请求
+func Post(ctx context.Context, requestUrl string, params interface{}, headers map[string]string, timeOut time.Duration, result interface{}) error {
 	req := fasthttp.AcquireRequest()
-	req.SetRequestURI("http://localhost:8080/")
+	defer fasthttp.ReleaseRequest(req)
+
+	req.SetRequestURI(requestUrl)
 	req.Header.SetMethod(fasthttp.MethodPost)
-	req.Header.SetContentTypeBytes(headerContentTypeJson)
-	req.SetBodyRaw(reqEntityBytes)
+
+	req.Header.SetContentType(constant.ContentTypeJson)
+	if headers[constant.HeaderKeyContextType] == constant.ContentTypeForm {
+		req.Header.SetContentType(constant.ContentTypeForm)
+	}
+
+	marshal, err := sonic.Marshal(params)
+	if err != nil {
+		return err
+	}
+	req.SetBody(marshal)
 
 	resp := fasthttp.AcquireResponse()
-	err := client.DoTimeout(req, resp, reqTimeout)
-	fasthttp.ReleaseRequest(req)
 	defer fasthttp.ReleaseResponse(resp)
 
+	err = client.DoTimeout(req, resp, timeOut)
 	if err != nil {
-		errName, known := httpConnError(err)
-		if known {
-			fmt.Fprintf(os.Stderr, "WARN conn error: %v\n", errName)
-		} else {
-			fmt.Fprintf(os.Stderr, "ERR conn failure: %v %v\n", errName, err)
-		}
-
-		return
+		return err
 	}
 
 	statusCode := resp.StatusCode()
 	respBody := resp.Body()
-	fmt.Printf("DEBUG Response: %s\n", respBody)
 
 	if statusCode != http.StatusOK {
-		fmt.Fprintf(os.Stderr, "ERR invalid HTTP response code: %d\n", statusCode)
-
-		return
+		errInner := errors.New("data request failed , code:" + strconv.Itoa(statusCode))
+		return errInner
 	}
 
 	respEntity := &Entity{}
 	err = json.Unmarshal(respBody, respEntity)
-	if err == nil || errors.Is(err, io.EOF) {
-		fmt.Printf("DEBUG Parsed Response: %v\n", respEntity)
-	} else {
-		fmt.Fprintf(os.Stderr, "ERR failed to parse response: %v\n", err)
-	}
-}
-
-func httpConnError(err error) (string, bool) {
-	var (
-		errName string
-		known   = true
-	)
-
-	switch {
-	case errors.Is(err, fasthttp.ErrTimeout):
-		errName = "timeout"
-	case errors.Is(err, fasthttp.ErrNoFreeConns):
-		errName = "conn_limit"
-	case errors.Is(err, fasthttp.ErrConnectionClosed):
-		errName = "conn_close"
-	case reflect.TypeOf(err).String() == "*net.OpError":
-		errName = "timeout"
-	default:
-		known = false
+	if err != nil {
+		return err
 	}
 
-	return errName, known
+	return nil
 }
