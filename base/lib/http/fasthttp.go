@@ -2,24 +2,22 @@ package http
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"go-web-template/base/common/constant"
+	"github.com/bytedance/sonic"
+	"github.com/valyala/fasthttp"
+	"github.com/xiaotianfork/go-querystring-json/query"
 	"net/http"
 	"net/url"
 	"strconv"
 	"sync"
 	"time"
 
-	"go.uber.org/zap"
-
-	"github.com/bytedance/sonic"
-	"github.com/google/go-querystring/query"
-	"github.com/valyala/fasthttp"
+	"go-web-template/base/common/constant"
 	"go-web-template/base/common/utils"
 	"go-web-template/base/lib/config"
 	"go-web-template/base/lib/logger"
+	"go.uber.org/zap"
 )
 
 var client *fasthttp.Client
@@ -49,14 +47,40 @@ func Init(config config.FastHttp) {
 	})
 }
 
-// GetTimeOut Get请求
+// Get Get请求，不需要设置超时时间
 //
-// params: 请求参数，为结构体类型需要在字段后面加 url tag
+// params: 请求参数，为结构体类型需要在字段后面加 json tag，会自动转换为对应的参数
 //
 //	type request struct {
-//		Name    string   `url:"name"`
-//		Age     int      `url:"age"`
-//		Friends []string `url:"friends"`
+//		Name    string   `json:"name"`
+//		Age     int      `json:"age"`
+//		Friends []string `json:"friends"`
+//	}
+func Get(ctx context.Context, requestUrl string, params interface{}, headers map[string]string, result interface{}) error {
+	return GetTimeOut(ctx, requestUrl, params, headers, time.Duration(0), result)
+}
+
+// Post Post请求，不需要设置超时时间
+//
+// params: 请求参数，为结构体类型需要在字段后面加 json tag
+//
+//	type request struct {
+//		Name    string   `json:"name"`
+//		Age     int      `json:"age"`
+//		Friends []string `json:"friends"`
+//	}
+func Post(ctx context.Context, requestUrl string, params interface{}, headers map[string]string, result interface{}) error {
+	return PostTimeOut(ctx, requestUrl, params, headers, time.Duration(0), result)
+}
+
+// GetTimeOut Get请求，需要设置超时时间
+//
+// params: 请求参数，为结构体类型需要在字段后面加 json tag，会自动转换为对应的参数
+//
+//	type request struct {
+//		Name    string   `json:"name"`
+//		Age     int      `json:"age"`
+//		Friends []string `json:"friends"`
 //	}
 func GetTimeOut(ctx context.Context, requestUrl string, params interface{}, headers map[string]string, timeOut time.Duration, result interface{}) error {
 	ctx = utils.WithChildSpan(ctx, "get:"+requestUrl)
@@ -68,7 +92,6 @@ func GetTimeOut(ctx context.Context, requestUrl string, params interface{}, head
 		return err
 	}
 
-	//将结构体转换为url.Values，需要在结构体中添加tag:url
 	queryValues := url.Values{}
 	if params != nil {
 		queryValues, err = query.Values(params)
@@ -77,8 +100,6 @@ func GetTimeOut(ctx context.Context, requestUrl string, params interface{}, head
 			return err
 		}
 	}
-
-	//设置参数
 
 	logger.Info(ctx, "request url", zap.String("url", requestUrl), zap.Any("header", headers))
 
@@ -90,33 +111,25 @@ func GetTimeOut(ctx context.Context, requestUrl string, params interface{}, head
 	//请求数据
 	resp := fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseResponse(resp)
-	err = client.DoTimeout(req, resp, timeOut)
+
+	err = doTimeOut(ctx, req, resp, timeOut, result)
 	if err != nil {
-		logger.SpanFailed(ctx, "http get failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(err))
 		return err
 	}
 
-	//状态码验证
-	statusCode := resp.StatusCode()
-	if statusCode != http.StatusOK {
-		errInner := errors.New("data request failed , code:" + strconv.Itoa(statusCode))
-		logger.SpanFailed(ctx, "http get failed", zap.Int("code", statusCode), zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(errInner))
-		return errInner
-	}
-
-	//反序列化参数
-	err = sonic.Unmarshal(resp.Body(), result)
-	if err != nil {
-		logger.SpanFailed(ctx, "json unmarshal failed", zap.Int("code", statusCode), zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.String("data", string(resp.Body())), zap.Error(err))
-		return err
-	}
-
-	logger.SpanSuccess(ctx, "http get success", zap.Int("code", statusCode), zap.String("url", requestUrl), zap.Any("header", headers))
-
+	logger.SpanSuccess(ctx, "request success", zap.String("req", req.String()))
 	return nil
 }
 
-// PostTimeOut Post请求
+// PostTimeOut Post请求，不需要设置超时时间
+//
+// params: 请求参数为结构体类型，需要在字段后面加 json tag，会自动转换为对应的参数
+//
+//	type request struct {
+//		Name    string   `json:"name"`
+//		Age     int      `json:"age"`
+//		Friends []string `json:"friends"`
+//	}
 func PostTimeOut(ctx context.Context, requestUrl string, params interface{}, headers map[string]string, timeOut time.Duration, result interface{}) error {
 	ctx = utils.WithChildSpan(ctx, "post:"+requestUrl)
 
@@ -136,35 +149,60 @@ func PostTimeOut(ctx context.Context, requestUrl string, params interface{}, hea
 	req.Header.SetContentType(constant.ContentTypeJson)
 	if headers[constant.HeaderKeyContextType] == constant.ContentTypeForm {
 		req.Header.SetContentType(constant.ContentTypeForm)
+		values, err := query.Values(params)
+		if err != nil {
+			logger.SpanFailed(ctx, "form data encode failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(err))
+			return err
+		}
+		req.SetBodyString(values.Encode())
+	} else {
+		marshal, err := sonic.Marshal(params)
+		if err != nil {
+			logger.SpanFailed(ctx, "json marshal failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(err))
+			return err
+		}
+		req.SetBody(marshal)
 	}
-
-	// body
-	marshal, err := sonic.Marshal(params)
-	if err != nil {
-		logger.SpanFailed(ctx, "json marshal failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(err))
-		return err
-	}
-	req.SetBody(marshal)
 
 	resp := fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseResponse(resp)
-	err = client.DoTimeout(req, resp, timeOut)
+
+	// 请求并解析数据
+	err = doTimeOut(ctx, req, resp, timeOut, result)
 	if err != nil {
-		logger.SpanFailed(ctx, "http post failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(err))
 		return err
 	}
 
-	respBody := resp.Body()
+	logger.SpanSuccess(ctx, "request success", zap.String("req", req.String()))
+	return nil
+}
 
-	if resp.StatusCode() != http.StatusOK {
-		errInner := errors.New("data request failed , code:" + strconv.Itoa(resp.StatusCode()))
-		logger.SpanFailed(ctx, "http post failed", zap.Int("code", resp.StatusCode()), zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(errInner))
+func doTimeOut(ctx context.Context, req *fasthttp.Request, resp *fasthttp.Response, timeOut time.Duration, result interface{}) error {
+	var err error
+
+	if timeOut <= 0 {
+		err = client.Do(req, resp)
+	} else {
+		err = client.DoTimeout(req, resp, timeOut)
+	}
+
+	if err != nil {
+		logger.SpanFailed(ctx, "http get failed", zap.String("req", req.String()), zap.Error(err))
+		return err
+	}
+
+	//状态码验证
+	statusCode := resp.StatusCode()
+	if statusCode != http.StatusOK {
+		errInner := errors.New("data request failed , code:" + strconv.Itoa(statusCode))
+		logger.SpanFailed(ctx, "http get failed", zap.Int("code", statusCode), zap.String("req", req.String()), zap.Error(errInner))
 		return errInner
 	}
 
-	err = json.Unmarshal(respBody, result)
+	//反序列化参数
+	err = sonic.Unmarshal(resp.Body(), result)
 	if err != nil {
-		logger.SpanFailed(ctx, "json unmarshal failed", zap.Int("code", resp.StatusCode()), zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.String("data", string(respBody)), zap.Error(err))
+		logger.SpanFailed(ctx, "json unmarshal failed", zap.Int("code", statusCode), zap.String("req", req.String()), zap.String("data", string(resp.Body())), zap.Error(err))
 		return err
 	}
 

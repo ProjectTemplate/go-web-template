@@ -56,7 +56,9 @@ type LoggerConfig struct {
 
 // FastHttp 配置
 type FastHttp struct {
-	ReadTimeOut         time.Duration `mapstructure:"read_time_out"`
+	// ReadTimeOut 从读缓冲区读取数据的超时时间，如果在调用的时候指定超时时间，则最短的一个会生效
+	ReadTimeOut time.Duration `mapstructure:"read_time_out"`
+	// WriteTimeOut 写入响应数据的超时时间，如果在调用的时候指定超时时间，则最短的一个会生效
 	WriteTimeOut        time.Duration `mapstructure:"write_time_out"`
 	MaxIdleConnDuration time.Duration `mapstructure:"max_idle_conn_duration"`
 }

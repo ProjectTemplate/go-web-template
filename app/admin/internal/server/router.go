@@ -11,6 +11,7 @@ import (
 
 var redisTest *redis.Client
 var pingPong *api.PingPong
+var postApi *api.PostApi
 
 func InitDependence(ctx context.Context, config *config.Configs) {
 	//初始化
@@ -23,8 +24,11 @@ func InitDependence(ctx context.Context, config *config.Configs) {
 
 	//api
 	pingPong = api.NewPingPong()
+	postApi = api.NewPostApi()
 }
 
 func RegisterRouter(e *gin.Engine) {
 	e.GET("ping", pingPong.Ping)
+	e.POST("form", postApi.Form)
+	e.POST("json", postApi.Json)
 }
