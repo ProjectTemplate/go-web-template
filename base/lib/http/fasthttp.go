@@ -47,6 +47,19 @@ func Init(config config.FastHttp) {
 	})
 }
 
+func simpleGet(url string) error {
+	req := fasthttp.AcquireRequest()
+	defer fasthttp.ReleaseRequest(req)
+
+	req.SetRequestURI(url)
+	req.Header.SetMethod(fasthttp.MethodGet)
+
+	//请求数据
+	resp := fasthttp.AcquireResponse()
+	defer fasthttp.ReleaseResponse(resp)
+	return client.Do(req, resp)
+}
+
 // Get Get请求，不需要设置超时时间
 //
 // params: 请求参数，为结构体类型需要在字段后面加 json tag，会自动转换为对应的参数

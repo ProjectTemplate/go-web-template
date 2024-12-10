@@ -2,8 +2,10 @@ package http
 
 import (
 	"github.com/go-resty/resty/v2"
+	"go-web-template/base/lib/config"
 	"net/http"
 	"testing"
+	"time"
 )
 
 func BenchmarkGet(b *testing.B) {
@@ -35,7 +37,15 @@ func BenchmarkHttp(b *testing.B) {
 }
 
 func BenchmarkFastHttp(b *testing.B) {
+	Init(config.FastHttp{
+		ReadTimeOut:         time.Second,
+		WriteTimeOut:        time.Second,
+		MaxIdleConnDuration: 1000000,
+	})
 	for i := 0; i < b.N; i++ {
-
+		err := simpleGet("http://www.baidu.com")
+		if err != nil {
+			b.Error(err)
+		}
 	}
 }
