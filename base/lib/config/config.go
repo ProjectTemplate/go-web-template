@@ -61,6 +61,7 @@ type FastHttp struct {
 	// WriteTimeOut 写入响应数据的超时时间，如果在调用的时候指定超时时间，则最短的一个会生效
 	WriteTimeOut        time.Duration `mapstructure:"write_time_out"`
 	MaxIdleConnDuration time.Duration `mapstructure:"max_idle_conn_duration"`
+	MaxConnsPerHost     int           `mapstructure:"max_conns_per_host"`
 }
 
 // MySQL 数据库配置

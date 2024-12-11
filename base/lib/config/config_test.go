@@ -31,6 +31,7 @@ func TestParseConfig(t *testing.T) {
 	assert.Equal(t, time.Millisecond*500, conf.FastHttp.ReadTimeOut)
 	assert.Equal(t, time.Millisecond*500, conf.FastHttp.WriteTimeOut)
 	assert.Equal(t, time.Hour, conf.FastHttp.MaxIdleConnDuration)
+	assert.Equal(t, 512, conf.FastHttp.MaxConnsPerHost)
 
 	assert.NotEmpty(t, conf.Mysql)
 	assert.Equal(t, 1, len(conf.Mysql))

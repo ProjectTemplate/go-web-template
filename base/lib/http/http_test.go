@@ -12,7 +12,7 @@ func BenchmarkGet(b *testing.B) {
 	client := resty.New()
 
 	for i := 0; i < b.N; i++ {
-		resp, err := client.GetClient().Get("http://www.baidu.com")
+		resp, err := client.GetClient().Get("http://127.0.0.1:8080/ping")
 		if err != nil {
 			b.Error(err)
 		}
@@ -25,7 +25,7 @@ func BenchmarkGet(b *testing.B) {
 
 func BenchmarkHttp(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		resp, err := http.Get("http://www.baidu.com")
+		resp, err := http.Get("http://127.0.0.1:8080/ping")
 		if err != nil {
 			b.Error(err)
 		}
@@ -38,12 +38,14 @@ func BenchmarkHttp(b *testing.B) {
 
 func BenchmarkFastHttp(b *testing.B) {
 	Init(config.FastHttp{
-		ReadTimeOut:         time.Second,
-		WriteTimeOut:        time.Second,
-		MaxIdleConnDuration: 1000000,
+		ReadTimeOut:         time.Second * 10,
+		WriteTimeOut:        time.Second * 10,
+		MaxIdleConnDuration: time.Hour,
+		MaxConnsPerHost:     200,
 	})
+
 	for i := 0; i < b.N; i++ {
-		err := simpleGet("http://www.baidu.com")
+		err := simpleGet("http://127.0.0.1:8080/ping")
 		if err != nil {
 			b.Error(err)
 		}

@@ -8,6 +8,7 @@
     max_age = 15
 
 [fast_http]
-    read_time_out = "5s"
-    write_time_out = "5s"
+    read_time_out = "500ms"
+    write_time_out = "500ms"
     max_idle_conn_duration = "1h"
+    max_conns_per_host = 512
