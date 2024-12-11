@@ -61,6 +61,8 @@ func main() {
 	initContext := middleware.InitContext(global.Configs.App.Name)
 	r.Use(panicRecover, initContext)
 
+	//初始化依赖
+	server.InitDependence(ctx, global.Configs)
 	//注册路由
 	server.RegisterRouter(r)
 
