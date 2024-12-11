@@ -5,4 +5,4 @@ server.log
 
 *.log
 
-script
+script/script

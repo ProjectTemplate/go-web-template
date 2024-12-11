@@ -1,0 +1,11 @@
+[app]
+    name = "go-web-template"
+
+[log]
+    console = true
+    level = "DEBUG"
+    path = "./"
+    file_name = "script.log"
+    max_size = 100
+    max_backups = 30
+    max_age = 15
