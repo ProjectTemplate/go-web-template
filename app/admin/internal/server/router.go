@@ -25,8 +25,10 @@ func InitDependence(ctx context.Context, config *config.Configs) {
 }
 
 func RegisterRouter(e *gin.Engine) {
-	e.GET("invoke", invokeApi.Invoke)
 	e.GET("ping", pingPong.Ping)
+
+	e.GET("invoke", invokeApi.Invoke)
+
 	e.POST("form", postApi.Form)
 	e.POST("json", postApi.Json)
 }
