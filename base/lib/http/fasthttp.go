@@ -36,8 +36,8 @@ func Init(config config.FastHttp) {
 			WriteTimeout:                  config.ReadTimeOut,
 			MaxIdleConnDuration:           config.MaxIdleConnDuration,
 			MaxConnsPerHost:               config.MaxConnsPerHost,
-			NoDefaultUserAgentHeader:      true, // default User-Agent: fasthttp
-			DisableHeaderNamesNormalizing: true, // If you set the case on your headers correctly you can enable this
+			NoDefaultUserAgentHeader:      false, // default User-Agent: fasthttp
+			DisableHeaderNamesNormalizing: true,  // If you set the case on your headers correctly you can enable this
 			DisablePathNormalizing:        true,
 			// increase DNS cache time to an hour instead of default minute
 			Dial: (&fasthttp.TCPDialer{
