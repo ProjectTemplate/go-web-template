@@ -7,8 +7,4 @@ const (
 	ContextKeySpan      = "span"
 	ContextKeyRemoteIp  = "remoteIp"
 	ContextKeyStartTime = "startTime"
-
-	HeaderKeyDomain  = ContextKeyDomain
-	HeaderKeyTraceId = ContextKeyTraceId
-	HeaderKeySpan    = ContextKeySpan
 )
