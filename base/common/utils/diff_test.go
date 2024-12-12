@@ -6,6 +6,15 @@ import (
 	"testing"
 )
 
+func TestDiffTextEmpty(t *testing.T) {
+	text1 := ""
+	text2 := ""
+
+	diffText := DiffText(text1, text2)
+
+	assert.Equal(t, text1, diffText)
+}
+
 func TestDiffTextSame(t *testing.T) {
 	text1 := "Hello A!"
 	text2 := "Hello A!"
