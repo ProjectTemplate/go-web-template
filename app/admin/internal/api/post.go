@@ -17,7 +17,7 @@ func (p *PostApi) Form(ginCtx *gin.Context) {
 	req := model.PostFormReq{}
 	err := ginCtx.ShouldBind(&req)
 	if err != nil {
-		response.ErrorWithReason(ginCtx, response.NewReason(response.AdminInternalErrorCode))
+		response.ErrorWithReason(ginCtx, response.AdminParamErrorReason)
 		return
 	}
 
@@ -30,7 +30,7 @@ func (p *PostApi) Json(ginCtx *gin.Context) {
 	req := model.PostJsonReq{}
 	err := ginCtx.ShouldBind(&req)
 	if err != nil {
-		response.ErrorWithReason(ginCtx, response.NewReason(response.AdminInternalErrorCode))
+		response.ErrorWithReason(ginCtx, response.AdminParamErrorReason)
 		return
 	}
 

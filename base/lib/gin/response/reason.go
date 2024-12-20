@@ -3,6 +3,11 @@ package response
 var (
 	// ReasonSuccess 成功
 	ReasonSuccess = Reason{SuccessCode, "success"}
+
+	// AdminInternalErrorReason 内部错误
+	AdminInternalErrorReason = NewReason(AdminCodeInternalError)
+	// AdminParamErrorReason 参数错误
+	AdminParamErrorReason = NewReason(AdminCodeParamError)
 )
 
 type Reason struct {

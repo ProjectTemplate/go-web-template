@@ -16,7 +16,7 @@ func NewPingPongApi() *PingPongApi {
 func (p *PingPongApi) Ping(ginCtx *gin.Context) {
 	request := model.PingPongRequest{}
 	if err := ginCtx.ShouldBind(&request); err != nil {
-		response.ErrorWithReason(ginCtx, response.NewReason(response.AdminInternalErrorCode))
+		response.ErrorWithReason(ginCtx, response.AdminParamErrorReason)
 		return
 	}
 

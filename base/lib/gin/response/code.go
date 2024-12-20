@@ -68,7 +68,8 @@ var (
 
 	// AdminCode 管理员项目错误码
 	AdminCode              = NewCode("101", "001", "001", "001").WithCode(CodeCommon)
-	AdminInternalErrorCode = AdminCode.WithCode(CodeInternalError)
+	AdminCodeInternalError = AdminCode.WithCode(CodeInternalError)
+	AdminCodeParamError    = AdminCode.WithCode(CodeParamError)
 )
 
 // Code 编码
