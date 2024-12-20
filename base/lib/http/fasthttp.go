@@ -43,10 +43,9 @@ func Init(config config.FastHttp) {
 			RetryIfErr: func(request *fasthttp.Request, attempts int, err error) (resetTimeout bool, retry bool) {
 				//幂等方法
 				methodNeedRetry := request.Header.IsGet() || request.Header.IsHead() || request.Header.IsPut()
-				if methodNeedRetry && attempts <= config.RetryTimes {
+				if methodNeedRetry {
 					return true, true
 				}
-
 				return false, false
 			},
 			// increase DNS cache time to an hour instead of default minute
