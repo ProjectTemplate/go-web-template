@@ -58,7 +58,7 @@ func main() {
 	r := gin.New()
 	// 中间件处理
 	panicRecover := middleware2.PanicRecover(response.NewReason(response.AdminInternalErrorCode))
-	initContext := middleware2.InitContext(global.Configs.App.Name)
+	initContext := middleware2.InitContext(global.Configs.App.Name, response.NewReason(response.AdminInternalErrorCode))
 	r.Use(panicRecover, initContext)
 
 	//初始化依赖

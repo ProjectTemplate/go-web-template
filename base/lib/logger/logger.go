@@ -166,7 +166,7 @@ func withCommonField(ctx context.Context, fields []zap.Field) []zap.Field {
 	commonFieldCount := 6
 	result := make([]zap.Field, commonFieldCount, len(fields)+commonFieldCount)
 	result[0] = zap.String(constant.LoggerKeyType, constant.LoggerTypeLog)
-	result[1] = zap.Int64(constant.LoggerKeyTimestamp, time.Now().UnixMicro())
+	result[1] = zap.Int64(constant.LoggerKeyTimestampUs, time.Now().UnixMicro())
 	result[2] = zap.Int64(constant.LoggerKeyDurationUs, time.Since(startTime).Microseconds())
 	result[3] = zap.String(constant.LoggerKeyTraceId, utils.GetTraceId(ctx))
 	result[4] = zap.String(constant.LoggerKeyParentSpan, span.GetParentSpan())

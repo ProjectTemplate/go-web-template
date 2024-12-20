@@ -59,7 +59,7 @@ func initContext() context.Context {
 	ctx := context.Background()
 	defer Flush()
 
-	ctx = utils.WithDomain(ctx, "www.baidu.com")
+	ctx = utils.WithHost(ctx, "www.baidu.com")
 	ctx = utils.WithTraceId(ctx, "trace-1231231232")
 	ctx = utils.WithSpan(ctx, utils.NewSpan("", ""))
 	ctx = utils.WithURL(ctx, "hello?name=world")

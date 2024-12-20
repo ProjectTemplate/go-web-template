@@ -9,7 +9,7 @@ const (
 	LoggerKeySpanEndUs      = "spanEndUs"
 	LoggerKeySpanDurationUs = "spanDurationUs"
 
-	LoggerKeyTimestamp = "timestamp"
+	LoggerKeyTimestampUs = "timestampUs"
 	// LoggerKeyDurationUs 时间间隔，单位微秒
 	LoggerKeyDurationUs = "durationUs"
 

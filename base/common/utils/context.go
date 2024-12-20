@@ -33,13 +33,57 @@ func GetSpan(ctx context.Context) *Span {
 	return EmptySpan
 }
 
-func WithDomain(parent context.Context, domain string) context.Context {
-	return context.WithValue(parent, constant.ContextKeyDomain, domain)
+func WithHost(parent context.Context, domain string) context.Context {
+	return context.WithValue(parent, constant.ContextKeyHost, domain)
 }
 
-func GetDomain(ctx context.Context) string {
-	if domain, ok := ctx.Value(constant.ContextKeyDomain).(string); ok {
+func WithPath(parent context.Context, path string) context.Context {
+	return context.WithValue(parent, constant.ContextKeyPath, path)
+}
+
+func WithQuery(parent context.Context, query string) context.Context {
+	return context.WithValue(parent, constant.ContextKeyQuery, query)
+}
+
+func WithPostForm(parent context.Context, postForm string) context.Context {
+	return context.WithValue(parent, constant.ContextKeyPostForm, postForm)
+}
+
+func WithRequestBody(parent context.Context, requestBody string) context.Context {
+	return context.WithValue(parent, constant.ContextKeyRequestBody, requestBody)
+}
+
+func GetHost(ctx context.Context) string {
+	if domain, ok := ctx.Value(constant.ContextKeyHost).(string); ok {
 		return domain
+	}
+	return ""
+}
+
+func GetPath(ctx context.Context) string {
+	if path, ok := ctx.Value(constant.ContextKeyPath).(string); ok {
+		return path
+	}
+	return ""
+}
+
+func GetQuery(ctx context.Context) string {
+	if query, ok := ctx.Value(constant.ContextKeyQuery).(string); ok {
+		return query
+	}
+	return ""
+}
+
+func GetPostForm(ctx context.Context) string {
+	if postForm, ok := ctx.Value(constant.ContextKeyPostForm).(string); ok {
+		return postForm
+	}
+	return ""
+}
+
+func GetRequestBody(ctx context.Context) string {
+	if requestBody, ok := ctx.Value(constant.ContextKeyRequestBody).(string); ok {
+		return requestBody
 	}
 	return ""
 }

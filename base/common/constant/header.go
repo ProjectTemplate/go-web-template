@@ -2,7 +2,7 @@ package constant
 
 const (
 	HeaderKeyContextType = "Content-Type"
-	HeaderKeyDomain      = ContextKeyDomain
+	HeaderKeyDomain      = ContextKeyHost
 	HeaderKeyTraceId     = ContextKeyTraceId
 	HeaderKeySpan        = ContextKeySpan
 )

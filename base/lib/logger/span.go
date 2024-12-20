@@ -5,6 +5,7 @@ import (
 	"go-web-template/base/common/constant"
 	"go-web-template/base/common/utils"
 	"go.uber.org/zap"
+	"time"
 )
 
 // SpanSuccess 当调用执行成功的时候调用
@@ -23,7 +24,7 @@ func withSpanField(ctx context.Context, fields ...zap.Field) []zap.Field {
 	span.End()
 	//在这里统一结束 Span
 
-	commonFieldCount := 7
+	commonFieldCount := 8
 	result := make([]zap.Field, commonFieldCount, len(fields)+commonFieldCount)
 	result[0] = zap.String(constant.LoggerKeyType, constant.LoggerTypeSpan)
 	result[1] = zap.String(constant.LoggerKeyParentSpan, span.GetParentSpan())
@@ -32,6 +33,7 @@ func withSpanField(ctx context.Context, fields ...zap.Field) []zap.Field {
 	result[4] = zap.Int64(constant.LoggerKeySpanStartUs, span.GetStartTime())
 	result[5] = zap.Int64(constant.LoggerKeySpanEndUs, span.GetEndTime())
 	result[6] = zap.Int64(constant.LoggerKeySpanDurationUs, span.GetDuration())
+	result[7] = zap.Int64(constant.LoggerKeyTimestampUs, time.Now().UnixMicro())
 
 	return append(result, fields...)
 }
