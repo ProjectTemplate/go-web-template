@@ -62,6 +62,7 @@ type FastHttp struct {
 	WriteTimeOut        time.Duration `mapstructure:"write_time_out"`
 	MaxIdleConnDuration time.Duration `mapstructure:"max_idle_conn_duration"`
 	MaxConnsPerHost     int           `mapstructure:"max_conns_per_host"`
+	RetryTimes          int           `mapstructure:"retry_times"`
 }
 
 // MySQL 数据库配置

@@ -32,6 +32,7 @@ type Entity struct {
 func Init(config config.FastHttp) {
 	clientOnce.Do(func() {
 		client = &fasthttp.Client{
+			MaxIdemponentCallAttempts:     config.RetryTimes,
 			ReadTimeout:                   config.ReadTimeOut,
 			WriteTimeout:                  config.ReadTimeOut,
 			MaxIdleConnDuration:           config.MaxIdleConnDuration,
@@ -39,6 +40,15 @@ func Init(config config.FastHttp) {
 			NoDefaultUserAgentHeader:      false, // default User-Agent: fasthttp
 			DisableHeaderNamesNormalizing: true,  // If you set the case on your headers correctly you can enable this
 			DisablePathNormalizing:        true,
+			RetryIfErr: func(request *fasthttp.Request, attempts int, err error) (resetTimeout bool, retry bool) {
+				//幂等方法
+				methodNeedRetry := request.Header.IsGet() || request.Header.IsHead() || request.Header.IsPut()
+				if methodNeedRetry && attempts <= config.RetryTimes {
+					return true, true
+				}
+
+				return false, false
+			},
 			// increase DNS cache time to an hour instead of default minute
 			Dial: (&fasthttp.TCPDialer{
 				Concurrency:      4096,

@@ -19,6 +19,7 @@
     write_time_out = "500ms"
     max_idle_conn_duration = "1h"
     max_conns_per_host = 512
+    retry_times = 2
 
 [mysql.test]
     dsn = [  #数据源的连接信息，支持多个，第一个库为主库，其余的为只读库

@@ -12,3 +12,4 @@
     write_time_out = "500ms"
     max_idle_conn_duration = "1h"
     max_conns_per_host = 512
+    retry_times = 2
