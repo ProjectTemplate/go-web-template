@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	middleware2 "go-web-template/base/lib/gin/middleware"
 	"path/filepath"
 	"time"
 
@@ -16,7 +17,6 @@ import (
 	"go-web-template/base/lib/config"
 	"go-web-template/base/lib/gin/response"
 	"go-web-template/base/lib/logger"
-	"go-web-template/base/lib/middleware"
 	"go-web-template/base/lib/signal"
 )
 
@@ -57,8 +57,8 @@ func main() {
 
 	r := gin.New()
 	// 中间件处理
-	panicRecover := middleware.PanicRecover(response.NewReason(response.AdminInternalErrorCode))
-	initContext := middleware.InitContext(global.Configs.App.Name)
+	panicRecover := middleware2.PanicRecover(response.NewReason(response.AdminInternalErrorCode))
+	initContext := middleware2.InitContext(global.Configs.App.Name)
 	r.Use(panicRecover, initContext)
 
 	//初始化依赖
