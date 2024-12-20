@@ -9,16 +9,16 @@ import (
 
 // SpanSuccess 当调用执行成功的时候调用
 func SpanSuccess(ctx context.Context, msg string, fields ...zap.Field) {
-	logger.Info(msg, WithSpanField(ctx, fields...)...)
+	logger.Info(msg, withSpanField(ctx, fields...)...)
 }
 
 // SpanFailed 当调用执行失败的时候调用
 func SpanFailed(ctx context.Context, msg string, fields ...zap.Field) {
-	logger.Error(msg, WithSpanField(ctx, fields...)...)
+	logger.Error(msg, withSpanField(ctx, fields...)...)
 }
 
-// WithSpanField 添加公用的Span日志字段
-func WithSpanField(ctx context.Context, fields ...zap.Field) []zap.Field {
+// withSpanField 添加公用的Span日志字段
+func withSpanField(ctx context.Context, fields ...zap.Field) []zap.Field {
 	span := utils.GetSpan(ctx)
 	span.End()
 	//在这里统一结束 Span

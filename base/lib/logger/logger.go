@@ -141,51 +141,38 @@ func checkNil() {
 
 func Debug(ctx context.Context, msg string, fields ...zap.Field) {
 	checkNil()
-	logger.Debug(msg, commonLoggerFields(ctx, fields)...)
+	logger.Debug(msg, withCommonField(ctx, fields)...)
 }
 
 func Info(ctx context.Context, msg string, fields ...zap.Field) {
 	checkNil()
-	logger.Info(msg, commonLoggerFields(ctx, fields)...)
+	logger.Info(msg, withCommonField(ctx, fields)...)
 }
 
 func Warn(ctx context.Context, msg string, fields ...zap.Field) {
 	checkNil()
-	logger.Warn(msg, commonLoggerFields(ctx, fields)...)
+	logger.Warn(msg, withCommonField(ctx, fields)...)
 }
 
 func Error(ctx context.Context, msg string, fields ...zap.Field) {
 	checkNil()
-	logger.Error(msg, commonLoggerFields(ctx, fields)...)
+	logger.Error(msg, withCommonField(ctx, fields)...)
 }
 
-func commonLoggerKeyValues(ctx context.Context) []interface{} {
+func withCommonField(ctx context.Context, fields []zap.Field) []zap.Field {
 	startTime := utils.GetStartTime(ctx)
 	span := utils.GetSpan(ctx)
-	return []interface{}{
-		constant.LoggerKeyType, constant.LoggerTypeLog,
-		constant.LoggerKeyTimestamp, time.Now().UnixMilli(),
-		constant.LoggerKeyDurationUs, time.Since(startTime).Microseconds(),
-		constant.LoggerKeyTraceId, utils.GetTraceId(ctx),
-		constant.LoggerKeyParentSpan, span.GetParentSpan(),
-		constant.LoggerKeySpan, span.Span(),
-	}
-}
 
-func commonLoggerFields(ctx context.Context, fields []zap.Field) []zap.Field {
-	loggerKeyValues := commonLoggerKeyValues(ctx)
+	commonFieldCount := 6
+	result := make([]zap.Field, commonFieldCount, len(fields)+commonFieldCount)
+	result[0] = zap.String(constant.LoggerKeyType, constant.LoggerTypeLog)
+	result[1] = zap.Int64(constant.LoggerKeyTimestamp, time.Now().UnixMicro())
+	result[2] = zap.Int64(constant.LoggerKeyDurationUs, time.Since(startTime).Microseconds())
+	result[3] = zap.String(constant.LoggerKeyTraceId, utils.GetTraceId(ctx))
+	result[4] = zap.String(constant.LoggerKeyParentSpan, span.GetParentSpan())
+	result[5] = zap.String(constant.LoggerKeySpan, span.Span())
 
-	result := make([]zap.Field, len(loggerKeyValues)/2+len(fields))
-	for i := 0; i < len(loggerKeyValues); i += 2 {
-		if _, ok := loggerKeyValues[i+1].(string); ok {
-			result[i/2] = zap.String(loggerKeyValues[i].(string), loggerKeyValues[i+1].(string))
-		} else {
-			result[i/2] = zap.Any(loggerKeyValues[i].(string), loggerKeyValues[i+1])
-		}
-	}
-
-	copy(result[cap(result)-len(fields):], fields)
-	return result
+	return append(result, fields...)
 }
 
 func Flush() error {

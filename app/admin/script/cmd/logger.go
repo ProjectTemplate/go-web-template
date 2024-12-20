@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/spf13/cobra"
 	"go-web-template/app/admin/internal/global"
+	"go-web-template/base/common/utils"
 	"go-web-template/base/lib/config"
 	"go-web-template/base/lib/logger"
 	"strings"
@@ -15,7 +16,8 @@ func init() {
 	rootCmd.AddCommand(loggerCmd)
 	flags := loggerCmd.PersistentFlags()
 	flags.StringVar(&level, "level", "", "日志级别 [debug,info,warn,error]")
-	loggerCmd.MarkPersistentFlagRequired("level")
+	err := loggerCmd.MarkPersistentFlagRequired("level")
+	utils.PanicAndPrintIfNotNil(err)
 }
 
 var loggerCmd = &cobra.Command{
