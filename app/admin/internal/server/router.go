@@ -10,6 +10,7 @@ import (
 var pingPong *api.PingPongApi
 var postApi *api.PostApi
 var invokeApi *api.InvokeApi
+var getApi *api.GetApi
 
 func InitDependence(ctx context.Context, config *config.Configs) {
 
@@ -19,10 +20,13 @@ func InitDependence(ctx context.Context, config *config.Configs) {
 	pingPong = api.NewPingPongApi()
 	postApi = api.NewPostApi()
 	invokeApi = api.NewInvokeApi()
+	getApi = api.NewGetApi()
 }
 
 func RegisterRouter(e *gin.Engine) {
 	e.GET("ping", pingPong.Ping)
+
+	e.GET("get", getApi.Get)
 
 	e.GET("invoke", invokeApi.Invoke)
 
