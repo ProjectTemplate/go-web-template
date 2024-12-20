@@ -137,6 +137,7 @@ func GetTimeOut(ctx context.Context, requestUrl string, params interface{}, head
 
 	err = doTimeOut(ctx, req, resp, timeOut, result)
 	if err != nil {
+		logger.SpanFailed(ctx, "do request failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(err))
 		return err
 	}
 
