@@ -2,6 +2,7 @@ package utils
 
 import (
 	"github.com/fatih/structs"
+
 	"go-web-template/base/common/constant"
 )
 

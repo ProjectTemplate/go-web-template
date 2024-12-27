@@ -2,13 +2,15 @@ package mysql
 
 import (
 	"context"
-	"go-web-template/base/lib/config"
-	"go-web-template/base/lib/logger"
+
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
 	"gorm.io/plugin/dbresolver"
+
+	"go-web-template/base/lib/config"
+	"go-web-template/base/lib/logger"
 )
 
 // dbMap 存储初始化后的数据库实例

@@ -2,10 +2,12 @@ package redis
 
 import (
 	"context"
+
 	"github.com/redis/go-redis/v9"
+	"go.uber.org/zap"
+
 	"go-web-template/base/lib/config"
 	"go-web-template/base/lib/logger"
-	"go.uber.org/zap"
 )
 
 var redisClient map[string]*redis.Client

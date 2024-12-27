@@ -2,13 +2,13 @@ package nacos
 
 import (
 	"context"
-	"github.com/nacos-group/nacos-sdk-go/v2/clients"
-	"go.uber.org/zap"
 
+	"github.com/nacos-group/nacos-sdk-go/v2/clients"
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/config_client"
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/naming_client"
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
+	"go.uber.org/zap"
 
 	"go-web-template/base/lib/config"
 	"go-web-template/base/lib/logger"
@@ -69,6 +69,7 @@ func GetNamingClient(ctx context.Context, name string) naming_client.INamingClie
 }
 
 // Init 初始化nacos客户端
+// nolint:gocyclo
 func Init(ctx context.Context, nacosConfigs map[string]config.Nacos) {
 	logger.Info(ctx, "Init Nacos start.", zap.Any("nacosConfigs", nacosConfigs))
 

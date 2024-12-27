@@ -5,7 +5,7 @@ type cacheState struct {
 }
 
 func (c *cacheState) active() bool {
-	return c.state == true
+	return c.state
 }
 
 func (c *cacheState) enable() {

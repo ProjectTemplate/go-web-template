@@ -2,12 +2,14 @@ package logger
 
 import (
 	"context"
-	"go-web-template/base/common/utils"
-	"go-web-template/base/lib/config"
-	"go.uber.org/zap"
 	"sync"
 	"testing"
 	"time"
+
+	"go.uber.org/zap"
+
+	"go-web-template/base/common/utils"
+	"go-web-template/base/lib/config"
 )
 
 func initLogger(name string) {
@@ -19,7 +21,6 @@ func initLogger(name string) {
 
 func TestWBackground(t *testing.T) {
 	initLogger("TestF")
-	defer Flush()
 
 	ctx := initContext()
 
@@ -34,11 +35,11 @@ func TestWBackground(t *testing.T) {
 
 	Error(ctx, "Error")
 	Error(ctx, "Error", WithHttpField(ctx, zap.String("number", "1"))...)
+
 }
 
 func TestW(t *testing.T) {
 	initLogger("TestF")
-	defer Flush()
 
 	ctx := initContext()
 
@@ -53,11 +54,11 @@ func TestW(t *testing.T) {
 
 	Error(ctx, "Error")
 	Error(ctx, "Error", zap.String("number", "1"))
+
 }
 
 func initContext() context.Context {
 	ctx := context.Background()
-	defer Flush()
 
 	ctx = utils.WithHost(ctx, "www.baidu.com")
 	ctx = utils.WithTraceId(ctx, "trace-1231231232")
@@ -69,7 +70,6 @@ func initContext() context.Context {
 
 func TestMultiSingle(t *testing.T) {
 	initLogger("TestMultiSingle")
-	defer Flush()
 
 	times := 1024
 	for i := 0; i < times; i++ {
@@ -79,7 +79,6 @@ func TestMultiSingle(t *testing.T) {
 
 func TestMultiOpen(t *testing.T) {
 	initLogger("TestMultiOpen")
-	defer Flush()
 
 	ctx := initContext()
 
@@ -102,12 +101,12 @@ func TestMultiOpen(t *testing.T) {
 	}()
 
 	waitGroup.Wait()
+
 }
 
 // BenchmarkLogger-8   	  374352	      3036 ns/op
 func BenchmarkLogger(b *testing.B) {
 	initLogger("TestMultiSingle")
-	defer Flush()
 
 	for i := 0; i < b.N; i++ {
 		Info(context.Background(), "测试打印日志", zap.String("name", "name"))

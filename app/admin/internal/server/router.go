@@ -2,7 +2,9 @@ package server
 
 import (
 	"context"
+
 	"github.com/gin-gonic/gin"
+
 	"go-web-template/app/admin/internal/api"
 	"go-web-template/base/lib/config"
 )

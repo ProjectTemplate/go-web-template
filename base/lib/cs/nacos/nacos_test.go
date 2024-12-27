@@ -2,11 +2,13 @@ package nacos
 
 import (
 	"context"
+	"testing"
+
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 	"github.com/stretchr/testify/assert"
+
 	"go-web-template/base/lib/config"
 	"go-web-template/base/lib/logger"
-	"testing"
 )
 
 func TestConnection(t *testing.T) {

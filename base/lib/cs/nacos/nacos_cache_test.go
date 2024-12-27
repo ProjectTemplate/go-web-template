@@ -2,14 +2,16 @@ package nacos
 
 import (
 	"context"
-	"github.com/nacos-group/nacos-sdk-go/v2/vo"
-	"github.com/stretchr/testify/assert"
-	"go-web-template/base/lib/config"
-	"go-web-template/base/lib/logger"
-	"go.uber.org/zap"
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/nacos-group/nacos-sdk-go/v2/vo"
+	"github.com/stretchr/testify/assert"
+	"go.uber.org/zap"
+
+	"go-web-template/base/lib/config"
+	"go-web-template/base/lib/logger"
 )
 
 func TestNacosCache(t *testing.T) {

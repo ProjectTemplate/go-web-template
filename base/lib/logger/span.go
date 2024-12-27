@@ -2,10 +2,12 @@ package logger
 
 import (
 	"context"
+	"time"
+
+	"go.uber.org/zap"
+
 	"go-web-template/base/common/constant"
 	"go-web-template/base/common/utils"
-	"go.uber.org/zap"
-	"time"
 )
 
 // SpanSuccess 当调用执行成功的时候调用
@@ -35,7 +37,7 @@ func withSpanField(ctx context.Context, fields ...zap.Field) []zap.Field {
 	result[6] = zap.Int64(constant.LoggerKeySpanDurationUs, span.GetDuration())
 	result[7] = zap.Int64(constant.LoggerKeyTimestampUs, time.Now().UnixMicro())
 	result[8] = zap.String(constant.LoggerKeyTraceId, utils.GetTraceId(ctx))
-	result[9] = zap.Int64(constant.LoggerKeyDurationUs, time.Now().Sub(utils.GetStartTime(ctx)).Microseconds())
+	result[9] = zap.Int64(constant.LoggerKeyDurationUs, time.Since(utils.GetStartTime(ctx)).Microseconds())
 
 	return append(result, fields...)
 }

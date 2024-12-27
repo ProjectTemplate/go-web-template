@@ -2,9 +2,10 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+
 	"go-web-template/base/lib/gin/response"
 	"go-web-template/base/lib/logger"
-	"go.uber.org/zap"
 )
 
 // PanicRecover panic recover middleware

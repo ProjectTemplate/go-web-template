@@ -2,13 +2,15 @@ package middleware
 
 import (
 	"bytes"
+	"io"
+	"time"
+
 	"github.com/gin-gonic/gin"
+
 	"go-web-template/base/common/constant"
 	"go-web-template/base/common/utils"
 	"go-web-template/base/lib/gin/response"
 	"go-web-template/base/lib/logger"
-	"io"
-	"time"
 )
 
 func InitContext(projectName string, reason response.Reason) gin.HandlerFunc {

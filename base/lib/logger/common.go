@@ -2,9 +2,11 @@ package logger
 
 import (
 	"context"
+
+	"go.uber.org/zap"
+
 	"go-web-template/base/common/constant"
 	"go-web-template/base/common/utils"
-	"go.uber.org/zap"
 )
 
 // WithHttpField 添加公用的HTTP日志字段

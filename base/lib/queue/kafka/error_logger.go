@@ -3,9 +3,11 @@ package kafka
 import (
 	"context"
 	"fmt"
+
 	"github.com/segmentio/kafka-go"
-	"go-web-template/base/lib/logger"
 	"go.uber.org/zap"
+
+	"go-web-template/base/lib/logger"
 )
 
 var _ kafka.Logger = (*kafkaErrorLogger)(nil)

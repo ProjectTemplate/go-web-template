@@ -4,7 +4,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	middleware2 "go-web-template/base/lib/gin/middleware"
 	"path/filepath"
 	"time"
 
@@ -15,6 +14,7 @@ import (
 	"go-web-template/app/admin/internal/server"
 	"go-web-template/base/common/utils"
 	"go-web-template/base/lib/config"
+	middleware2 "go-web-template/base/lib/gin/middleware"
 	"go-web-template/base/lib/gin/response"
 	"go-web-template/base/lib/logger"
 	"go-web-template/base/lib/signal"

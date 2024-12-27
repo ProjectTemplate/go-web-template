@@ -2,12 +2,14 @@ package cmd
 
 import (
 	"context"
+	"strings"
+
 	"github.com/spf13/cobra"
+
 	"go-web-template/app/admin/internal/global"
 	"go-web-template/base/common/utils"
 	"go-web-template/base/lib/config"
 	"go-web-template/base/lib/logger"
-	"strings"
 )
 
 var level string

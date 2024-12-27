@@ -2,12 +2,14 @@ package api
 
 import (
 	"context"
+	"time"
+
 	"github.com/gin-gonic/gin"
+
 	"go-web-template/app/admin/internal/model"
 	"go-web-template/base/common/utils"
 	"go-web-template/base/lib/gin/response"
 	"go-web-template/base/lib/logger"
-	"time"
 )
 
 type InvokeApi struct {

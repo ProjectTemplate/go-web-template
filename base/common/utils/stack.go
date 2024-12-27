@@ -37,9 +37,11 @@ func (f Frame) String() string {
 		if sb.Len() > 0 {
 			sb.WriteRune(' ')
 		}
-		fmt.Fprintf(&sb, "(%v", f.File)
+		_, err := fmt.Fprintf(&sb, "(%v", f.File)
+		PanicAndPrintIfNotNil(err)
 		if f.Line > 0 {
-			fmt.Fprintf(&sb, ":%d", f.Line)
+			_, err = fmt.Fprintf(&sb, ":%d", f.Line)
+			PanicAndPrintIfNotNil(err)
 		}
 		sb.WriteRune(')')
 	}
@@ -81,13 +83,17 @@ func (fs Stack) String() string {
 func (fs Stack) Format(w fmt.State, c rune) {
 	if !w.Flag('+') {
 		// Without %+v, fall back to String().
-		io.WriteString(w, fs.String())
+		_, err := io.WriteString(w, fs.String())
+		PanicAndPrintIfNotNil(err)
 		return
 	}
 
 	for _, f := range fs {
-		fmt.Fprintln(w, f.Function)
-		fmt.Fprintf(w, "\t%v:%v\n", f.File, f.Line)
+		_, err := fmt.Fprintln(w, f.Function)
+		PanicAndPrintIfNotNil(err)
+
+		_, err = fmt.Fprintf(w, "\t%v:%v\n", f.File, f.Line)
+		PanicAndPrintIfNotNil(err)
 	}
 }
 

@@ -1,9 +1,10 @@
 package utils
 
 import (
+	"testing"
+
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func BenchmarkUUID(b *testing.B) {

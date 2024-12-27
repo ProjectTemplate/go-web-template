@@ -3,12 +3,14 @@ package kafka
 import (
 	"context"
 	"encoding/json"
-	"github.com/segmentio/kafka-go"
-	"github.com/stretchr/testify/assert"
-	"go-web-template/base/lib/config"
-	"go-web-template/base/lib/logger"
 	"testing"
 	"time"
+
+	"github.com/segmentio/kafka-go"
+	"github.com/stretchr/testify/assert"
+
+	"go-web-template/base/lib/config"
+	"go-web-template/base/lib/logger"
 )
 
 type testData struct {

@@ -1,11 +1,13 @@
 package http
 
 import (
-	"github.com/go-resty/resty/v2"
-	"go-web-template/base/lib/config"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/go-resty/resty/v2"
+
+	"go-web-template/base/lib/config"
 )
 
 func BenchmarkGet(b *testing.B) {

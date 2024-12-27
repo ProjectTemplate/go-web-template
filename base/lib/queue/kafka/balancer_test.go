@@ -1,8 +1,9 @@
 package kafka
 
 import (
-	"github.com/segmentio/kafka-go"
 	"testing"
+
+	"github.com/segmentio/kafka-go"
 )
 
 var partitions = []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}

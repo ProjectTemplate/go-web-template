@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+
 	"go-web-template/app/admin/internal/model"
 	"go-web-template/base/lib/gin/response"
 )

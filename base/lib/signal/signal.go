@@ -2,11 +2,13 @@ package signal
 
 import (
 	"context"
-	"go-web-template/base/lib/logger"
-	"go.uber.org/zap"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"go.uber.org/zap"
+
+	"go-web-template/base/lib/logger"
 )
 
 func HandleSignal(ctx context.Context, close func()) {

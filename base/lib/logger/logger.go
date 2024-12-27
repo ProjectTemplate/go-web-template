@@ -3,9 +3,6 @@ package logger
 import (
 	"context"
 	"fmt"
-	"go-web-template/base/common/constant"
-	"go-web-template/base/common/utils"
-	"go-web-template/base/lib/config"
 	"os"
 	"path"
 	"strings"
@@ -14,6 +11,10 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
+
+	"go-web-template/base/common/constant"
+	"go-web-template/base/common/utils"
+	"go-web-template/base/lib/config"
 )
 
 var (

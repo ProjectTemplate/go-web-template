@@ -2,11 +2,13 @@ package redis
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
-	"go-web-template/base/lib/config"
-	"go-web-template/base/lib/logger"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+
+	"go-web-template/base/lib/config"
+	"go-web-template/base/lib/logger"
 )
 
 func TestRedis(t *testing.T) {

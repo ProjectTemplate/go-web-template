@@ -3,16 +3,16 @@ package kafka
 import (
 	"context"
 	"errors"
-	"github.com/segmentio/kafka-go"
-	"go-web-template/base/lib/logger"
-	"go.uber.org/zap"
 	"sync"
 	"time"
 
+	"github.com/segmentio/kafka-go"
 	"github.com/segmentio/kafka-go/sasl/plain"
+	"go.uber.org/zap"
 
 	"go-web-template/base/common/utils"
 	"go-web-template/base/lib/config"
+	"go-web-template/base/lib/logger"
 )
 
 var kafkaClusters map[string]*kafkaWriterReader

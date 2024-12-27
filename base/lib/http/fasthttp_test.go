@@ -2,12 +2,14 @@ package http
 
 import (
 	"context"
+	"testing"
+	"time"
+
 	"github.com/stretchr/testify/assert"
+
 	"go-web-template/base/common/constant"
 	"go-web-template/base/lib/config"
 	"go-web-template/base/lib/logger"
-	"testing"
-	"time"
 )
 
 func TestGet(t *testing.T) {

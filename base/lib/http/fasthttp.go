@@ -4,20 +4,21 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/bytedance/sonic"
-	"github.com/valyala/fasthttp"
-	"github.com/xiaotianfork/go-querystring-json/query"
 	"net/http"
 	"net/url"
 	"strconv"
 	"sync"
 	"time"
 
+	"github.com/bytedance/sonic"
+	"github.com/valyala/fasthttp"
+	"github.com/xiaotianfork/go-querystring-json/query"
+	"go.uber.org/zap"
+
 	"go-web-template/base/common/constant"
 	"go-web-template/base/common/utils"
 	"go-web-template/base/lib/config"
 	"go-web-template/base/lib/logger"
-	"go.uber.org/zap"
 )
 
 var client *fasthttp.Client

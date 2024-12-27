@@ -2,10 +2,12 @@ package nacos
 
 import (
 	"context"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
+
 	"go-web-template/base/lib/config"
 	"go-web-template/base/lib/logger"
-	"testing"
 )
 
 func TestSearchAll(t *testing.T) {

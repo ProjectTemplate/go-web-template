@@ -3,10 +3,12 @@ package mysql
 import (
 	"context"
 	"fmt"
-	"github.com/stretchr/testify/assert"
+	"testing"
+
 	"go-web-template/base/lib/config"
 	"go-web-template/base/lib/logger"
-	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCount(t *testing.T) {
