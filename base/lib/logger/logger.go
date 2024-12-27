@@ -37,6 +37,8 @@ const (
 )
 
 // Init 初始化日志
+//
+//nolint:gocyclo
 func Init(projectName string, loggerConfig config.LoggerConfig) {
 	filePath := defaultPath
 	fileName := defaultFileName

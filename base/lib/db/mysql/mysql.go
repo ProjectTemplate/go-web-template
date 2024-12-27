@@ -42,6 +42,8 @@ func GetDB(ctx context.Context, name string) *gorm.DB {
 //	max_idle_time = "10m"      连接的最大空闲时间
 //	show_log = false           是否展示MySQL日志
 //	slow_threshold = "1ms"     慢查询阈值
+//
+//nolint:gocyclo
 func Init(ctx context.Context, dbConfigs map[string]config.MySQL) {
 	logger.Info(ctx, "init MySQL, config info: ", zap.Any("config", dbConfigs))
 	dbMap = make(map[string]*gorm.DB)
@@ -52,7 +54,6 @@ func Init(ctx context.Context, dbConfigs map[string]config.MySQL) {
 			panic("init MySQL config error, dsn is empty. db name: " + dnName)
 		}
 
-		//主库，第一个配置为主库
 		customGormLogger := NewGormLogger(dbConfig.SlowThreshold)
 		if !dbConfig.ShowLog {
 			customGormLogger.LogMode(gormLogger.Silent)
@@ -60,6 +61,7 @@ func Init(ctx context.Context, dbConfigs map[string]config.MySQL) {
 			customGormLogger.LogMode(gormLogger.Info)
 		}
 
+		//主库，第一个配置为主库
 		db, err := gorm.Open(mysql.Open(dbConfig.DSN[0]), &gorm.Config{
 			Logger: customGormLogger,
 		})
