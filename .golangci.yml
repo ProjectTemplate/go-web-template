@@ -1,0 +1,18 @@
+linters:
+  disable-all: false
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - unused
+    - gocyclo
+    - gofmt
+    - goimports
+  fast: true
+
+linters-settings:
+  gocyclo:
+    min-complexity: 10
