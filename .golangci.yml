@@ -1,5 +1,7 @@
+run:
+  timeout: 5m
 linters:
-  disable-all: false
+  disable-all: true
   enable:
     - errcheck
     - gosimple
