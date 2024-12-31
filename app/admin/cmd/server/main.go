@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	_ "go.uber.org/automaxprocs"
 	"go.uber.org/zap"
 
 	"go-web-template/app/admin/internal/global"
