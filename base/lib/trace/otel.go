@@ -19,14 +19,18 @@ import (
 	"go.uber.org/zap"
 )
 
-var innerTracer otelTrace.Tracer
+var tracer otelTrace.Tracer
 
 func GetTracer() otelTrace.Tracer {
-	return innerTracer
+	if tracer == nil {
+		utils.PanicAndPrintIfNotNil(errors.New("Tracer is nil, please init it before use"))
+	}
+	return tracer
 }
 
 // Init 初始化Trace
 func Init(ctx context.Context, traceConfig config.Trace) {
+
 	if traceConfig.Endpoint == "" || traceConfig.ServiceName == "" {
 		utils.PanicAndPrintIfNotNil(errors.New("Init trace config is empty"))
 	}
@@ -36,16 +40,17 @@ func Init(ctx context.Context, traceConfig config.Trace) {
 		utils.PanicAndPrintIfNotNil(err)
 		return
 	}
+
+	// 设置全局的Provider
 	otel.SetTracerProvider(tracerProvider)
 	// 设置全局传播器
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
 
-	innerTracer = otel.Tracer(traceConfig.ServiceName)
+	tracer = otel.Tracer(traceConfig.ScopeName)
 
 	go func() {
 		defer utils.RecoverWithFmt()
 
-		//todo 优雅处理shutdown
 		<-ctx.Done()
 		err := tracerProvider.Shutdown(ctx)
 		if err != nil {
@@ -59,12 +64,12 @@ func Init(ctx context.Context, traceConfig config.Trace) {
 
 func newTraceProvider(ctx context.Context, traceConfig config.Trace) (*trace.TracerProvider, error) {
 	options := make([]otlptracehttp.Option, 0)
-	options = append(options, otlptracehttp.WithEndpoint(traceConfig.Endpoint)) // 设置OTEL服务地址
+	options = append(options, otlptracehttp.WithEndpoint(traceConfig.Endpoint))
 	if traceConfig.Insecure {
 		options = append(options, otlptracehttp.WithInsecure())
 	}
 
-	logger.Info(ctx, "newTraceProvider with options", zap.Any("options", options))
+	logger.Info(ctx, "newTraceProvider new exporter with options", zap.Any("options", options))
 	exporter, err := otlptracehttp.New(ctx, options...)
 	if err != nil {
 		return nil, err
@@ -83,6 +88,7 @@ func newTraceProvider(ctx context.Context, traceConfig config.Trace) (*trace.Tra
 		attributes = append(attributes, semconv.ServiceVersionKey.String(traceConfig.ServiceVersion))
 	}
 
+	logger.Info(ctx, "newTraceProvider new resource with options", zap.Any("options", options))
 	res, err := resource.New(ctx, resource.WithAttributes(attributes...))
 	if err != nil {
 		return nil, err

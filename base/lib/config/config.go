@@ -147,6 +147,8 @@ type Trace struct {
 	// Insecure 是否忽略证书
 	Insecure bool `mapstructure:"insecure"`
 
+	// ScopeName 命名空间名字
+	ScopeName string `mapstructure:"scope_name"`
 	// ServiceNamespace 服务命名空间
 	ServiceNamespace string `mapstructure:"service_namespace"`
 	// ServiceName 服务名

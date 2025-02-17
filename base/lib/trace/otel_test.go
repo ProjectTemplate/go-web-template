@@ -2,7 +2,6 @@ package trace
 
 import (
 	"context"
-	"go.opentelemetry.io/otel/attribute"
 	"net/http"
 	"testing"
 	"time"
@@ -11,6 +10,7 @@ import (
 	"go-web-template/base/lib/logger"
 
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/propagation"
 	"go.uber.org/zap"
 )
@@ -22,6 +22,7 @@ func TestOtel(t *testing.T) {
 	logger.Init("TestOtel", configStruct.LoggerConfig)
 
 	Init(context.Background(), configStruct.Otel.Trace)
+
 	go run()
 
 	time.Sleep(time.Second * 10)
@@ -46,17 +47,19 @@ func run() {
 
 	time.Sleep(time.Second)
 
-	//模拟 http 调用，通过Header传递信息
-	mockRequestHttp(newRequest)
+	mockRequestHttpServer(newRequest)
 }
 
-func mockRequestHttp(req *http.Request) {
+// mockRequestHttp 模拟 http 调用，通过Header传递信息
+func mockRequestHttpServer(req *http.Request) {
 	// 模拟从Http Header中读取数据
 	ctx2 := otel.GetTextMapPropagator().Extract(context.Background(), propagation.HeaderCarrier(req.Header))
 	_, span2 := GetTracer().Start(ctx2, "span2")
+	defer span2.End()
+
 	span2.SetAttributes(attribute.String("http.method", "get"))
 	span2.SetAttributes(attribute.String("http.url", "ping"))
 	span2.SetAttributes(attribute.String("user", "123456"))
-	defer span2.End()
+
 	time.Sleep(time.Second)
 }
