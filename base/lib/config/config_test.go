@@ -94,4 +94,11 @@ func TestParseConfig(t *testing.T) {
 	assert.Equal(t, 1, len(conf.Kafka["test-sasl_plaintext"].Readers))
 	assert.Equal(t, "test", conf.Kafka["test-sasl_plaintext"].Writers[0].Name)
 	assert.Equal(t, "test", conf.Kafka["test-sasl_plaintext"].Readers[0].Name)
+
+	assert.Equal(t, "127.0.0.1:4318", conf.Otel.Trace.Endpoint)
+	assert.Equal(t, true, conf.Otel.Trace.Insecure)
+	assert.Equal(t, "service_namespace_test", conf.Otel.Trace.ServiceNamespace)
+	assert.Equal(t, "service_test", conf.Otel.Trace.ServiceName)
+	assert.Equal(t, "instance_test", conf.Otel.Trace.ServiceInstanceID)
+	assert.Equal(t, "v1.0.0", conf.Otel.Trace.ServiceVersion)
 }

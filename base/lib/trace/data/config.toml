@@ -1,0 +1,18 @@
+[log]
+    console = true
+    level = "DEBUG"
+    path = "./"
+    file_name = "server.log"
+    max_size = 100
+    max_backups = 30
+    max_age = 15
+
+[otel.trace]
+    endpoint = "127.0.0.1:4318"
+    insecure = true
+    service_name = "service_test"
+    service_namespace = "service_namespace_test"
+    service_instance_id = "instance_test"
+    service_version = "v1.0.0"
+
+

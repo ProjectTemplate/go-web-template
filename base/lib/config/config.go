@@ -23,6 +23,7 @@ type Configs struct {
 	Nacos        map[string]Nacos `mapstructure:"nacos"`
 	Redis        map[string]Redis `mapstructure:"redis"`
 	Kafka        map[string]Kafka `mapstructure:"kafka"`
+	Otel         Otel             `mapstructure:"otel"`
 }
 
 type App struct {
@@ -133,4 +134,25 @@ type KafkaWriter struct {
 	//
 	// all 等待所有在ISR里面的节点确认
 	AckConfig string `mapstructure:"ack_config"`
+}
+
+type Otel struct {
+	Trace Trace `mapstructure:"trace"`
+}
+
+type Trace struct {
+	// Endpoint 服务端地址 such as "127.0.0.1:4318"
+	Endpoint string `mapstructure:"endpoint"`
+
+	// Insecure 是否忽略证书
+	Insecure bool `mapstructure:"insecure"`
+
+	// ServiceNamespace 服务命名空间
+	ServiceNamespace string `mapstructure:"service_namespace"`
+	// ServiceName 服务名
+	ServiceName string `mapstructure:"service_name"`
+	// ServiceInstanceID 服务示例ID
+	ServiceInstanceID string `mapstructure:"service_instance_id"`
+	// ServiceVersion 服务版本
+	ServiceVersion string `mapstructure:"service_version"`
 }
