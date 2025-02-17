@@ -2,6 +2,7 @@ package trace
 
 import (
 	"context"
+	"go.opentelemetry.io/otel/attribute"
 	"net/http"
 	"testing"
 	"time"
@@ -21,17 +22,13 @@ func TestOtel(t *testing.T) {
 	logger.Init("TestOtel", configStruct.LoggerConfig)
 
 	Init(context.Background(), configStruct.Otel.Trace)
-
-	go handle()
+	go run()
 
 	time.Sleep(time.Second * 10)
 }
 
-func handle() {
-	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
-	defer cancelFunc()
-
-	ctx1, span1 := GetTracer().Start(ctx, "span1")
+func run() {
+	ctx1, span1 := GetTracer().Start(context.Background(), "span1")
 	defer span1.End()
 
 	//模拟 http 请求添加header
@@ -41,10 +38,15 @@ func handle() {
 	logger.Info(ctx1, "inject success", zap.Any("header", newRequest.Header))
 
 	// 添加日志
-	span1.AddEvent("test event")
+	span1.AddEvent("message to record what happened in the span, information1")
+	span1.AddEvent("message to record what happened in the span, information1")
+	span1.SetAttributes(attribute.String("http.method", "get"))
+	span1.SetAttributes(attribute.String("http.url", "ping"))
+	span1.SetAttributes(attribute.String("user", "123456"))
+
 	time.Sleep(time.Second)
 
-	//模拟调用
+	//模拟 http 调用，通过Header传递信息
 	mockRequestHttp(newRequest)
 }
 
@@ -52,6 +54,9 @@ func mockRequestHttp(req *http.Request) {
 	// 模拟从Http Header中读取数据
 	ctx2 := otel.GetTextMapPropagator().Extract(context.Background(), propagation.HeaderCarrier(req.Header))
 	_, span2 := GetTracer().Start(ctx2, "span2")
+	span2.SetAttributes(attribute.String("http.method", "get"))
+	span2.SetAttributes(attribute.String("http.url", "ping"))
+	span2.SetAttributes(attribute.String("user", "123456"))
 	defer span2.End()
 	time.Sleep(time.Second)
 }
