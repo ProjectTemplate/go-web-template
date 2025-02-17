@@ -2,7 +2,6 @@ package trace
 
 import (
 	"context"
-	"go.opentelemetry.io/otel/propagation"
 
 	"go-web-template/base/common/utils"
 	"go-web-template/base/lib/config"
@@ -12,6 +11,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
+	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.10.0"
@@ -45,17 +45,15 @@ func Init(ctx context.Context, traceConfig config.Trace) {
 	go func() {
 		defer utils.RecoverWithFmt()
 
-		select {
 		//todo 优雅处理shutdown
-		case <-ctx.Done():
-			err := tracerProvider.Shutdown(ctx)
-			if err != nil {
-				logger.Error(ctx, "shutdown otel trace provider failed", zap.Error(err))
-				return
-			}
-			logger.Info(ctx, "shutdown otel trace provider success")
+		<-ctx.Done()
+		err := tracerProvider.Shutdown(ctx)
+		if err != nil {
+			logger.Error(ctx, "shutdown otel trace provider failed", zap.Error(err))
 			return
 		}
+
+		logger.Info(ctx, "shutdown otel trace provider success")
 	}()
 }
 

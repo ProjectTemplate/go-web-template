@@ -3,9 +3,11 @@ package etcd
 import (
 	"context"
 	"fmt"
-	"go-web-template/base/common/utils"
-	etcdCliend "go.etcd.io/etcd/client/v3"
 	"time"
+
+	"go-web-template/base/common/utils"
+
+	etcdCliend "go.etcd.io/etcd/client/v3"
 )
 
 func Init() {

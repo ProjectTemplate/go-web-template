@@ -1,5 +1,5 @@
 package prometheus
 
 func Init() {
-	
+
 }

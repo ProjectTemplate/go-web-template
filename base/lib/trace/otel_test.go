@@ -2,7 +2,6 @@ package trace
 
 import (
 	"context"
-	"go.uber.org/zap"
 	"net/http"
 	"testing"
 	"time"
@@ -12,6 +11,7 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
+	"go.uber.org/zap"
 )
 
 // jaeger 服务端测试通过
@@ -28,7 +28,8 @@ func TestOtel(t *testing.T) {
 }
 
 func handle() {
-	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancelFunc()
 
 	ctx1, span1 := GetTracer().Start(ctx, "span1")
 	defer span1.End()
@@ -50,7 +51,7 @@ func handle() {
 func mockRequestHttp(req *http.Request) {
 	// 模拟从Http Header中读取数据
 	ctx2 := otel.GetTextMapPropagator().Extract(context.Background(), propagation.HeaderCarrier(req.Header))
-	ctx2, span2 := GetTracer().Start(ctx2, "span2")
+	_, span2 := GetTracer().Start(ctx2, "span2")
 	defer span2.End()
 	time.Sleep(time.Second)
 }
