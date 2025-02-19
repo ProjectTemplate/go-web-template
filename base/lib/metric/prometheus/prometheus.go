@@ -1,5 +1,0 @@
-package prometheus
-
-func Init() {
-
-}

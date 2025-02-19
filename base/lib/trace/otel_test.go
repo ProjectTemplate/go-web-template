@@ -23,9 +23,13 @@ func TestOtel(t *testing.T) {
 
 	Init(context.Background(), configStruct.Otel.Trace)
 
-	go run()
+	go func() {
+		for {
+			go run()
+		}
+	}()
 
-	time.Sleep(time.Second * 10)
+	time.Sleep(time.Second * 200)
 }
 
 func run() {
