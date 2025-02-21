@@ -19,7 +19,7 @@ import (
 func TestOtel(t *testing.T) {
 	configStruct := &config.Configs{}
 	config.Init("./data/config.toml", configStruct)
-	logger.Init("TestOtel", configStruct.LoggerConfig)
+	logger.Init("TestOtelTrace", configStruct.LoggerConfig)
 
 	Init(context.Background(), configStruct.Otel.Trace)
 
@@ -29,7 +29,7 @@ func TestOtel(t *testing.T) {
 		}
 	}()
 
-	time.Sleep(time.Second * 200)
+	time.Sleep(time.Second * 10)
 }
 
 func run() {

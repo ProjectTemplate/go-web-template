@@ -141,4 +141,10 @@ pQ70wChNi914c4B+SxkGUg==
     service_instance_id = "instance_test"
     service_version = "v1.0.0"
 
+[otel.metric]
+    endpoint = "127.0.0.1:4318"
+    insecure = true
+    cluster = "cluster_test"
+    service_name = "service_test"
+
 

@@ -7,13 +7,10 @@
     max_backups = 30
     max_age = 15
 
-[otel.trace]
+[otel.metric]
     endpoint = "127.0.0.1:4318"
     insecure = true
-    scope_name = "go-web-template"
-    service_namespace = "service_namespace_test"
+    cluster = "cluster_test"
     service_name = "service_test"
-    service_instance_id = "instance_test"
-    service_version = "v1.0.0"
 
 

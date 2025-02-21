@@ -137,13 +137,13 @@ type KafkaWriter struct {
 }
 
 type Otel struct {
-	Trace Trace `mapstructure:"trace"`
+	Trace  Trace  `mapstructure:"trace"`
+	Metric Metric `mapstructure:"metric"`
 }
 
 type Trace struct {
 	// Endpoint 服务端地址 such as "127.0.0.1:4318"
 	Endpoint string `mapstructure:"endpoint"`
-
 	// Insecure 是否忽略证书
 	Insecure bool `mapstructure:"insecure"`
 
@@ -157,4 +157,14 @@ type Trace struct {
 	ServiceInstanceID string `mapstructure:"service_instance_id"`
 	// ServiceVersion 服务版本
 	ServiceVersion string `mapstructure:"service_version"`
+}
+
+type Metric struct {
+	// Endpoint 服务端地址 such as "127.0.0.1:4318"
+	Endpoint string `mapstructure:"endpoint"`
+	// Insecure 是否忽略证书
+	Insecure bool `mapstructure:"insecure"`
+
+	Cluster     string `mapstructure:"cluster"`
+	ServiceName string `mapstructure:"service_name"`
 }

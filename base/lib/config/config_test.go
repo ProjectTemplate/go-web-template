@@ -102,4 +102,9 @@ func TestParseConfig(t *testing.T) {
 	assert.Equal(t, "service_test", conf.Otel.Trace.ServiceName)
 	assert.Equal(t, "instance_test", conf.Otel.Trace.ServiceInstanceID)
 	assert.Equal(t, "v1.0.0", conf.Otel.Trace.ServiceVersion)
+
+	assert.Equal(t, "cluster_test", conf.Otel.Metric.Cluster)
+	assert.Equal(t, "service_test", conf.Otel.Metric.ServiceName)
+	assert.Equal(t, true, conf.Otel.Metric.Insecure)
+	assert.Equal(t, "127.0.0.1:4318", conf.Otel.Metric.Endpoint)
 }
