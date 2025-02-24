@@ -3,7 +3,7 @@
 
 [server]
     name = "go-web-template"
-    address = "0.0.0.0:8080"
+    address = "0.0.0.0:8765"
     debug = true
 
 [log]
@@ -14,3 +14,12 @@
     max_size = 100
     max_backups = 30
     max_age = 15
+
+[otel.trace]
+    endpoint = "127.0.0.1:53710"
+    insecure = true
+    kind = "server"
+    scope_name = "BJ"
+    service_namespace = "go-web-template"
+    service_name = "admin"
+    service_version = "v1.0.0"

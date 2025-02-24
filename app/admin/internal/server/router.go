@@ -13,6 +13,7 @@ var pingPong *api.PingPongApi
 var postApi *api.PostApi
 var invokeApi *api.InvokeApi
 var getApi *api.GetApi
+var traceApi *api.TraceApi
 
 func InitDependence(ctx context.Context, config *config.Configs) {
 
@@ -23,6 +24,7 @@ func InitDependence(ctx context.Context, config *config.Configs) {
 	postApi = api.NewPostApi()
 	invokeApi = api.NewInvokeApi()
 	getApi = api.NewGetApi()
+	traceApi = api.NewTraceApi()
 }
 
 func RegisterRouter(e *gin.Engine) {
@@ -34,4 +36,6 @@ func RegisterRouter(e *gin.Engine) {
 
 	e.POST("form", postApi.Form)
 	e.POST("json", postApi.Json)
+
+	e.POST("trace", traceApi.Invoke)
 }

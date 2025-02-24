@@ -19,7 +19,35 @@ import (
 	"go.uber.org/zap"
 )
 
+var TagKindKey = "span.kind"
+
+var hostName = utils.GetHostName()
 var tracer otelTrace.Tracer
+
+func StartServer(ctx context.Context, spanName string, opts ...otelTrace.SpanStartOption) (context.Context, otelTrace.Span) {
+	opts = append(opts, otelTrace.WithSpanKind(otelTrace.SpanKindServer))
+	return GetTracer().Start(ctx, spanName, opts...)
+}
+
+func StartInternal(ctx context.Context, spanName string, opts ...otelTrace.SpanStartOption) (context.Context, otelTrace.Span) {
+	opts = append(opts, otelTrace.WithSpanKind(otelTrace.SpanKindInternal))
+	return GetTracer().Start(ctx, spanName, opts...)
+}
+
+func StartClient(ctx context.Context, spanName string, opts ...otelTrace.SpanStartOption) (context.Context, otelTrace.Span) {
+	opts = append(opts, otelTrace.WithSpanKind(otelTrace.SpanKindClient))
+	return GetTracer().Start(ctx, spanName, opts...)
+}
+
+func StartProducer(ctx context.Context, spanName string, opts ...otelTrace.SpanStartOption) (context.Context, otelTrace.Span) {
+	opts = append(opts, otelTrace.WithSpanKind(otelTrace.SpanKindProducer))
+	return GetTracer().Start(ctx, spanName, opts...)
+}
+
+func StartConsumer(ctx context.Context, spanName string, opts ...otelTrace.SpanStartOption) (context.Context, otelTrace.Span) {
+	opts = append(opts, otelTrace.WithSpanKind(otelTrace.SpanKindConsumer))
+	return GetTracer().Start(ctx, spanName, opts...)
+}
 
 func GetTracer() otelTrace.Tracer {
 	if tracer == nil {
@@ -45,7 +73,6 @@ func Init(ctx context.Context, traceConfig config.Trace) {
 	otel.SetTracerProvider(tracerProvider)
 	// 设置全局传播器
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
-
 	tracer = otel.Tracer(traceConfig.ScopeName)
 
 	go func() {
@@ -77,13 +104,15 @@ func newTraceProvider(ctx context.Context, traceConfig config.Trace) (*trace.Tra
 
 	// 创建资源，包含服务元数据
 	attributes := make([]attribute.KeyValue, 0)
+
 	attributes = append(attributes, semconv.ServiceNameKey.String(traceConfig.ServiceName))
+
 	if traceConfig.ServiceNamespace != "" {
 		attributes = append(attributes, semconv.ServiceNamespaceKey.String(traceConfig.ServiceNamespace))
 	}
-	if traceConfig.ServiceInstanceID != "" {
-		attributes = append(attributes, semconv.ServiceInstanceIDKey.String(traceConfig.ServiceInstanceID))
-	}
+
+	attributes = append(attributes, semconv.ServiceInstanceIDKey.String(hostName))
+
 	if traceConfig.ServiceVersion != "" {
 		attributes = append(attributes, semconv.ServiceVersionKey.String(traceConfig.ServiceVersion))
 	}

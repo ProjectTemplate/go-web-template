@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"go-web-template/base/lib/trace"
 	"path/filepath"
 	"time"
 
@@ -43,10 +44,15 @@ func main() {
 
 	initCommandLineFlag()
 
+	// 初始化-加载配置文件
 	config.Init(confFile, global.Configs)
 
+	// 初始化-日志组件
 	logger.Init(global.Configs.App.Name, global.Configs.LoggerConfig)
 	loggerFlushError := logger.Flush()
+
+	// 初始化-trace组件
+	trace.Init(ctx, global.Configs.Otel.Trace)
 
 	logger.Info(ctx, "start server.", zap.String("confFile", confFile), zap.Any("configs", global.Configs))
 
@@ -57,10 +63,13 @@ func main() {
 	gin.SetMode(ginMode)
 
 	r := gin.New()
+
 	// 中间件处理
 	panicRecover := middleware2.PanicRecover(response.AdminInternalErrorReason)
+	otelTrace := middleware2.InjectOtelTrace()
 	initContext := middleware2.InitContext(global.Configs.App.Name, response.AdminInternalErrorReason)
-	r.Use(panicRecover, initContext)
+
+	r.Use(panicRecover, otelTrace, initContext)
 
 	//初始化依赖
 	server.InitDependence(ctx, global.Configs)

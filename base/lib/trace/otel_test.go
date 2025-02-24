@@ -2,6 +2,7 @@ package trace
 
 import (
 	"context"
+	"math/rand"
 	"net/http"
 	"testing"
 	"time"
@@ -12,6 +13,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 )
 
@@ -25,15 +27,16 @@ func TestOtel(t *testing.T) {
 
 	go func() {
 		for {
+			time.Sleep(time.Millisecond * 100)
 			go run()
 		}
 	}()
 
-	time.Sleep(time.Second * 10)
+	time.Sleep(time.Second * 10000)
 }
 
 func run() {
-	ctx1, span1 := GetTracer().Start(context.Background(), "span1")
+	ctx1, span1 := GetTracer().Start(context.Background(), "span1", trace.WithNewRoot())
 	defer span1.End()
 
 	//模拟 http 请求添加header
@@ -49,7 +52,8 @@ func run() {
 	span1.SetAttributes(attribute.String("http.url", "ping"))
 	span1.SetAttributes(attribute.String("user", "123456"))
 
-	time.Sleep(time.Second)
+	i := rand.Int()/1000 + 1
+	time.Sleep(time.Millisecond * time.Duration(i))
 
 	mockRequestHttpServer(newRequest)
 }
@@ -65,5 +69,6 @@ func mockRequestHttpServer(req *http.Request) {
 	span2.SetAttributes(attribute.String("http.url", "ping"))
 	span2.SetAttributes(attribute.String("user", "123456"))
 
-	time.Sleep(time.Second)
+	i := rand.Int()/1000 + 1
+	time.Sleep(time.Millisecond * time.Duration(i))
 }

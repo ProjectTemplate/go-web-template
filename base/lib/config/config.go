@@ -153,8 +153,6 @@ type Trace struct {
 	ServiceNamespace string `mapstructure:"service_namespace"`
 	// ServiceName 服务名
 	ServiceName string `mapstructure:"service_name"`
-	// ServiceInstanceID 服务示例ID
-	ServiceInstanceID string `mapstructure:"service_instance_id"`
 	// ServiceVersion 服务版本
 	ServiceVersion string `mapstructure:"service_version"`
 }
