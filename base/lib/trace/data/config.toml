@@ -13,7 +13,6 @@
     scope_name = "go-web-template"
     service_namespace = "service_namespace_test"
     service_name = "service_test"
-    service_instance_id = "instance_test"
     service_version = "v1.0.0"
 
 
