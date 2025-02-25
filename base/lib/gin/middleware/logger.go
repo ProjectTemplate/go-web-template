@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"bytes"
+	otelTrace "go.opentelemetry.io/otel/trace"
 	"io"
 	"time"
 
@@ -15,8 +16,16 @@ import (
 
 func InitContext(projectName string, reason response.Reason) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// traceId
-		traceId := c.GetHeader(constant.HeaderKeyTraceId)
+		spanContext := otelTrace.SpanContextFromContext(c.Request.Context())
+
+		var traceId string
+		if spanContext.HasTraceID() {
+			traceId = spanContext.TraceID().String()
+		} else {
+			traceId = c.GetHeader(constant.HeaderKeyTraceId)
+		}
+
+		// 默认 traceId
 		if traceId == "" {
 			traceId = utils.UUID() + "." + projectName
 		}

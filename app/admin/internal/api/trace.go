@@ -2,6 +2,8 @@ package api
 
 import (
 	"context"
+	"go.opentelemetry.io/otel/attribute"
+	otelTrace "go.opentelemetry.io/otel/trace"
 	"time"
 
 	"go-web-template/app/admin/internal/model"
@@ -42,7 +44,12 @@ func (t *TraceApi) invokeServiceA(ctx context.Context) {
 }
 
 func (t *TraceApi) invokeServiceB(ctx context.Context) {
-	ctx, span := trace.StartInternal(ctx, "TraceApi_invokeServiceB")
+	spanContext := otelTrace.SpanContextFromContext(ctx)
+	ctx, span := trace.StartInternal(ctx, "TraceApi_invokeServiceB",
+		otelTrace.WithAttributes(attribute.String("level", "important")),
+	)
+	span.AddLink(otelTrace.Link{SpanContext: spanContext})
+
 	defer span.End()
 
 	ctx = utils.WithChildSpan(ctx, "serviceB")

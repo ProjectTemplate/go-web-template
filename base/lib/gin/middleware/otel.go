@@ -16,6 +16,7 @@ func InjectOtelTrace() gin.HandlerFunc {
 		defer span.End()
 
 		c.Request = c.Request.WithContext(ctx)
+
 		c.Next()
 	}
 }

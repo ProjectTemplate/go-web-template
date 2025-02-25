@@ -19,8 +19,6 @@ import (
 	"go.uber.org/zap"
 )
 
-var TagKindKey = "span.kind"
-
 var hostName = utils.GetHostName()
 var tracer otelTrace.Tracer
 
@@ -123,6 +121,6 @@ func newTraceProvider(ctx context.Context, traceConfig config.Trace) (*trace.Tra
 		return nil, err
 	}
 
-	tp := trace.NewTracerProvider(trace.WithBatcher(exporter), trace.WithResource(res))
+	tp := trace.NewTracerProvider(trace.WithBatcher(exporter), trace.WithResource(res), trace.WithSampler(&CustomSampler{}))
 	return tp, nil
 }
