@@ -13,6 +13,8 @@ import (
 	"go.opentelemetry.io/otel/sdk/metric"
 )
 
+var hostName = utils.GetHostName()
+
 func Init(ctx context.Context, metricConfig config.Metric) {
 	meterProvider, err := newMeterProvider(ctx, metricConfig)
 	if err != nil {
