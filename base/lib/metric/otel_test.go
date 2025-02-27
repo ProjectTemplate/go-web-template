@@ -51,7 +51,7 @@ func TestOtelMetric(t *testing.T) {
 
 		observer.ObserveInt64(goroutineCount, int64(runtime.NumGoroutine()),
 			metric.WithAttributes(
-				attribute.String("pod", "sass"),
+				attribute.String("pod", hostName),
 				attribute.String("cluster", configStruct.Otel.Metric.Cluster),
 				attribute.String("service_name", configStruct.Otel.Metric.ServiceName),
 			))
@@ -71,5 +71,5 @@ func TestOtelMetric(t *testing.T) {
 		}
 	}()
 
-	time.Sleep(time.Second * 1000)
+	time.Sleep(time.Second * 10000)
 }
