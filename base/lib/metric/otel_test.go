@@ -2,11 +2,13 @@ package metric
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
-	"go-web-template/base/lib/config"
-	"go-web-template/base/lib/logger"
 	"testing"
 	"time"
+
+	"go-web-template/base/lib/config"
+	"go-web-template/base/lib/logger"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestOtelMetric(t *testing.T) {
@@ -26,6 +28,9 @@ func TestOtelMetric(t *testing.T) {
 	assert.Nil(t, err)
 
 	err = RecordLoadInfo(configStruct.Otel.Metric)
+	assert.Nil(t, err)
+
+	err = RecordCpuInfo(configStruct.Otel.Metric)
 	assert.Nil(t, err)
 
 	go func() {
