@@ -2,7 +2,6 @@ package metric
 
 import (
 	"context"
-	metric2 "go.opentelemetry.io/otel/metric"
 	"time"
 
 	"go-web-template/base/common/utils"
@@ -10,6 +9,7 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
+	metric2 "go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/sdk/metric"
 )
 

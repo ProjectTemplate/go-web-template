@@ -29,7 +29,7 @@ func TestOtelMetric(t *testing.T) {
 	meter := NewMeter("meter_test")
 
 	// 定义 goroutine 数量指标
-	goroutineCount, err := meter.Int64ObservableGauge("goroutine_count_907",
+	goroutineCount, err := meter.Int64ObservableGauge("goroutine_count",
 		metric.WithDescription("Number of active goroutines"),
 	)
 	assert.Nil(t, err)
@@ -51,7 +51,7 @@ func TestOtelMetric(t *testing.T) {
 
 		observer.ObserveInt64(goroutineCount, int64(runtime.NumGoroutine()),
 			metric.WithAttributes(
-				attribute.String("pod", hostName),
+				attribute.String("pod", "sass"),
 				attribute.String("cluster", configStruct.Otel.Metric.Cluster),
 				attribute.String("service_name", configStruct.Otel.Metric.ServiceName),
 			))
