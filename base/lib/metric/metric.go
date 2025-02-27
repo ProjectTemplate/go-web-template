@@ -47,9 +47,19 @@ func RecordCpuInfo(metricConfig config.Metric) error {
 		return err
 	}
 
-	obs := []metric.Observable{cpuTotal, cpuSystem, cpuUser, cpuIdle, cpuSteal}
+	// CPU 窃取量
+	cpuUsage, err := meter.Float64ObservableGauge("cpu_usage", metric.WithDescription("the percentage of CPU usage"))
+	if err != nil {
+		return err
+	}
+
+	obs := []metric.Observable{cpuTotal, cpuSystem, cpuUser, cpuIdle, cpuSteal, cpuUsage}
 	_, err = meter.RegisterCallback(func(ctx context.Context, observer metric.Observer) error {
 		times, errInner := cpu.Times(false)
+		if errInner != nil {
+			return errInner
+		}
+		percent, errInner := cpu.Percent(0, false)
 		if errInner != nil {
 			return errInner
 		}
@@ -60,6 +70,7 @@ func RecordCpuInfo(metricConfig config.Metric) error {
 		observer.ObserveFloat64(cpuUser, stat.User/stat.Total()*100, initCommonAttributes(metricConfig))
 		observer.ObserveFloat64(cpuIdle, stat.Idle/stat.Total()*100, initCommonAttributes(metricConfig))
 		observer.ObserveFloat64(cpuSteal, stat.Steal/stat.Total()*100, initCommonAttributes(metricConfig))
+		observer.ObserveFloat64(cpuUsage, percent[0], initCommonAttributes(metricConfig))
 
 		return nil
 	}, obs...)
