@@ -4,22 +4,22 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"go-web-template/base/lib/trace"
 	"path/filepath"
 	"time"
-
-	"github.com/gin-gonic/gin"
-	_ "go.uber.org/automaxprocs"
-	"go.uber.org/zap"
 
 	"go-web-template/app/admin/internal/global"
 	"go-web-template/app/admin/internal/server"
 	"go-web-template/base/common/utils"
 	"go-web-template/base/lib/config"
-	middleware2 "go-web-template/base/lib/gin/middleware"
+	"go-web-template/base/lib/gin/middleware"
 	"go-web-template/base/lib/gin/response"
 	"go-web-template/base/lib/logger"
 	"go-web-template/base/lib/signal"
+	"go-web-template/base/lib/trace"
+
+	"github.com/gin-gonic/gin"
+	_ "go.uber.org/automaxprocs"
+	"go.uber.org/zap"
 )
 
 // confFile 配置文件路径
@@ -65,9 +65,9 @@ func main() {
 	r := gin.New()
 
 	// 中间件处理
-	panicRecover := middleware2.PanicRecover(response.AdminInternalErrorReason)
-	otelTrace := middleware2.InjectOtelTrace()
-	initContext := middleware2.InitContext(global.Configs.App.Name, response.AdminInternalErrorReason)
+	panicRecover := middleware.PanicRecover(response.AdminInternalErrorReason)
+	otelTrace := middleware.InjectOtelTrace()
+	initContext := middleware.InitContext(global.Configs.App.Name, response.AdminInternalErrorReason)
 
 	r.Use(panicRecover, otelTrace, initContext)
 
