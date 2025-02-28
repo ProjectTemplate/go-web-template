@@ -1,11 +1,13 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
+	"strings"
+
 	"go-web-template/base/lib/trace"
+
+	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
-	"strings"
 )
 
 func InjectOtelTrace() gin.HandlerFunc {

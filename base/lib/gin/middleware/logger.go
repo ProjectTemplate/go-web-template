@@ -2,16 +2,16 @@ package middleware
 
 import (
 	"bytes"
-	otelTrace "go.opentelemetry.io/otel/trace"
 	"io"
 	"time"
-
-	"github.com/gin-gonic/gin"
 
 	"go-web-template/base/common/constant"
 	"go-web-template/base/common/utils"
 	"go-web-template/base/lib/gin/response"
 	"go-web-template/base/lib/logger"
+
+	"github.com/gin-gonic/gin"
+	otelTrace "go.opentelemetry.io/otel/trace"
 )
 
 func InitContext(projectName string, reason response.Reason) gin.HandlerFunc {

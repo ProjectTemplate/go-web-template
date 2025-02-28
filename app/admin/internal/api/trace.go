@@ -2,8 +2,6 @@ package api
 
 import (
 	"context"
-	"go.opentelemetry.io/otel/attribute"
-	otelTrace "go.opentelemetry.io/otel/trace"
 	"time"
 
 	"go-web-template/app/admin/internal/model"
@@ -11,6 +9,9 @@ import (
 	"go-web-template/base/lib/gin/response"
 	"go-web-template/base/lib/logger"
 	"go-web-template/base/lib/trace"
+
+	"go.opentelemetry.io/otel/attribute"
+	otelTrace "go.opentelemetry.io/otel/trace"
 
 	"github.com/gin-gonic/gin"
 )

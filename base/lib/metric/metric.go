@@ -59,11 +59,12 @@ func RecordCpuInfo(metricConfig config.Metric) error {
 		if errInner != nil {
 			return errInner
 		}
+		stat := times[0]
+
 		percent, errInner := cpu.Percent(0, false)
 		if errInner != nil {
 			return errInner
 		}
-		stat := times[0]
 
 		observer.ObserveFloat64(cpuTotal, stat.Total()/stat.Total()*100, initCommonAttributes(metricConfig))
 		observer.ObserveFloat64(cpuSystem, stat.System/stat.Total()*100, initCommonAttributes(metricConfig))
