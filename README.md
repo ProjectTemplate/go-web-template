@@ -57,7 +57,7 @@ db := mysql.GetDB(background, "test")
 # 构建镜像
 docker build --build-arg APP_NAME="admin" --build-arg ENV_TYPE="dev" -t go-web-template:0.0.1 .
 # 运行镜像
-docker run -d --name=go-web go-web-template:0.0.1
+docker run -d --name=go-web -p 8080:80 go-web-template:0.0.1
 ```
 
 
