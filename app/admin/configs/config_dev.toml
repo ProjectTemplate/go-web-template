@@ -3,7 +3,7 @@
 
 [server]
     name = "go-web-template"
-    address = "0.0.0.0:8765"
+    address = "0.0.0.0:80"
     debug = true
 
 [log]

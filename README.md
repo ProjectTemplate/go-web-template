@@ -1,4 +1,4 @@
-# Go-Web-Template
+[//]: # (# Go-Web-Template)
 
 ## 简介
 
@@ -50,4 +50,14 @@ mysql.Init(background, global.Configs.Mysql)
 # 使用
 db := mysql.GetDB(background, "test")
 ```
+
+### 构建并运行项目
+
+```json
+# 构建镜像
+docker build --build-arg APP_NAME="admin" --build-arg ENV_TYPE="dev" -t go-web-template:0.0.1 .
+# 运行镜像
+docker run -d --name=go-web go-web-template:0.0.1
+```
+
 
