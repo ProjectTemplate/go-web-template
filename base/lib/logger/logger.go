@@ -112,8 +112,7 @@ func Init(projectName string, loggerConfig config.LoggerConfig) {
 
 	core := zapcore.NewTee(cores...)
 
-	logger = zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
-	logger = logger.WithOptions(zap.AddCallerSkip(1))
+	logger = zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel), zap.AddCallerSkip(1))
 }
 
 func NewEncoderConfig() zapcore.EncoderConfig {
