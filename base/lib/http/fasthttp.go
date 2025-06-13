@@ -93,8 +93,8 @@ func Get(ctx context.Context, requestUrl string, params interface{}, headers map
 //		Age     int      `json:"age"`
 //		Friends []string `json:"friends"`
 //	}
-func Post(ctx context.Context, requestUrl string, params interface{}, headers map[string]string, result interface{}) error {
-	return PostTimeOut(ctx, requestUrl, params, headers, time.Duration(0), result)
+func Post(ctx context.Context, requestUrl string, params interface{}, body interface{}, headers map[string]string, result interface{}) error {
+	return PostTimeOut(ctx, requestUrl, params, body, headers, time.Duration(0), result)
 }
 
 // GetTimeOut Get请求，需要设置超时时间
@@ -129,7 +129,13 @@ func GetTimeOut(ctx context.Context, requestUrl string, params interface{}, head
 
 	req := fasthttp.AcquireRequest()
 	defer fasthttp.ReleaseRequest(req)
-	req.SetRequestURI(fmt.Sprintf("%s?%s", requestUrl, queryValues.Encode()))
+
+	if params != nil {
+		req.SetRequestURI(fmt.Sprintf("%s?%s", requestUrl, queryValues.Encode()))
+	} else {
+		req.SetRequestURI(fmt.Sprintf("%s", requestUrl))
+	}
+
 	req.Header.SetMethod(fasthttp.MethodGet)
 
 	//请求数据
@@ -155,35 +161,52 @@ func GetTimeOut(ctx context.Context, requestUrl string, params interface{}, head
 //		Age     int      `json:"age"`
 //		Friends []string `json:"friends"`
 //	}
-func PostTimeOut(ctx context.Context, requestUrl string, params interface{}, headers map[string]string, timeOut time.Duration, result interface{}) error {
+func PostTimeOut(ctx context.Context, requestUrl string, params interface{}, body interface{}, headers map[string]string, timeOut time.Duration, result interface{}) error {
 	ctx = utils.WithChildSpan(ctx, "post:"+requestUrl)
 
 	//解析验证url
 	_, err := url.Parse(requestUrl)
 	if err != nil {
-		logger.SpanFailed(ctx, "parse url failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(err))
+		logger.SpanFailed(ctx, "parse url failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("body", body), zap.Any("header", headers), zap.Error(err))
 		return err
+	}
+
+	//url 参数
+	queryValues := url.Values{}
+	if params != nil {
+		queryValues, err = query.Values(params)
+		if err != nil {
+			logger.SpanFailed(ctx, "parse query params failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(err))
+			return err
+		}
 	}
 
 	req := fasthttp.AcquireRequest()
 	defer fasthttp.ReleaseRequest(req)
 	req.SetRequestURI(requestUrl)
 
+	//请求参数
+	if params != nil {
+		req.SetRequestURI(fmt.Sprintf("%s?%s", requestUrl, queryValues.Encode()))
+	} else {
+		req.SetRequestURI(fmt.Sprintf("%s", requestUrl))
+	}
+
 	// header
 	req.Header.SetMethod(fasthttp.MethodPost)
 	req.Header.SetContentType(constant.ContentTypeJson)
 	if headers[constant.HeaderKeyContextType] == constant.ContentTypeForm {
 		req.Header.SetContentType(constant.ContentTypeForm)
-		values, err := query.Values(params)
+		values, err := query.Values(body)
 		if err != nil {
-			logger.SpanFailed(ctx, "form data encode failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(err))
+			logger.SpanFailed(ctx, "form data encode failed", zap.String("requestUrl", requestUrl), zap.Any("body", body), zap.Any("header", headers), zap.Error(err))
 			return err
 		}
 		req.SetBodyString(values.Encode())
 	} else {
-		marshal, err := sonic.Marshal(params)
+		marshal, err := sonic.Marshal(body)
 		if err != nil {
-			logger.SpanFailed(ctx, "json marshal failed", zap.String("requestUrl", requestUrl), zap.Any("params", params), zap.Any("header", headers), zap.Error(err))
+			logger.SpanFailed(ctx, "json marshal failed", zap.String("requestUrl", requestUrl), zap.Any("body", body), zap.Any("header", headers), zap.Error(err))
 			return err
 		}
 		req.SetBody(marshal)

@@ -69,7 +69,7 @@ func TestPostForm(t *testing.T) {
 
 	background := context.Background()
 	result := &response{}
-	params := request{
+	body := request{
 		Name:    "test",
 		Age:     18,
 		Friends: []string{"name1", "name2"},
@@ -78,7 +78,7 @@ func TestPostForm(t *testing.T) {
 	headers := make(map[string]string)
 	headers[constant.HeaderKeyContextType] = constant.ContentTypeForm
 
-	err := PostTimeOut(background, "http://127.0.0.1:8080/form", params, headers, time.Second, result)
+	err := PostTimeOut(background, "http://127.0.0.1:8080/form", nil, body, headers, time.Second, result)
 
 	assert.Nil(t, err)
 }
@@ -114,7 +114,7 @@ func TestPostJson(t *testing.T) {
 
 	headers := make(map[string]string)
 	headers[constant.HeaderKeyContextType] = constant.ContentTypeJson
-	err := PostTimeOut(background, "http://127.0.0.1:8080/json", params, nil, time.Minute, result)
+	err := PostTimeOut(background, "http://127.0.0.1:8080/json", nil, params, nil, time.Minute, result)
 
 	assert.Nil(t, err)
 }
