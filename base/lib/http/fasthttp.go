@@ -130,6 +130,11 @@ func GetTimeOut(ctx context.Context, requestUrl string, params interface{}, head
 	req := fasthttp.AcquireRequest()
 	defer fasthttp.ReleaseRequest(req)
 
+	//请求头
+	for key, value := range headers {
+		req.Header.Add(key, value)
+	}
+
 	if params != nil {
 		req.SetRequestURI(fmt.Sprintf("%s?%s", requestUrl, queryValues.Encode()))
 	} else {
@@ -190,6 +195,11 @@ func PostTimeOut(ctx context.Context, requestUrl string, params interface{}, bod
 		req.SetRequestURI(fmt.Sprintf("%s?%s", requestUrl, queryValues.Encode()))
 	} else {
 		req.SetRequestURI(fmt.Sprintf("%s", requestUrl))
+	}
+
+	//请求头
+	for key, value := range headers {
+		req.Header.Add(key, value)
 	}
 
 	// header
